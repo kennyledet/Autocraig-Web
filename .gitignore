@@ -1,0 +1,7 @@
+*.pyc
+*.so
+*~
+lib/_autocraig.conf
+README
+env
+notes.txt
