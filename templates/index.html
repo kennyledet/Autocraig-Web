@@ -4,7 +4,6 @@
 	<title>AutoCraig-Web</title>
 	<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}" />
 	<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
-	<script src="{{ url_for('static', filename='bootstrap/js/bootstrap.js') }}"></script>
 </head>
 <body class="container-fluid">
 <div class="container-narrow">
@@ -47,18 +46,20 @@
 				    <input class="span2" id="sleep-time" type="text" placeholder="0"/>
 				    <span class="add-on">seconds</span>
     			</div>
-			    <div></div>
+			    <div style="margin-top:15px;"></div>
 
-			    <div class="input-append" style="margin-top:10px;">
-				    <label>Scrape URL</label>
-				    <input class="input-xxlarge" type="text" placeholder="http://orangecounty.craigslist.org/search/hhh?query=superior+newport+beach&minAsk=min&maxAsk=1350"/>
-
-				    <button type="submit" class="btn btn-primary">Go</button>
-				</div>
+			    <label>Scrape URLS</label>
+			    <textarea class="input-xxlarge expanding" type="text" placeholder="http://orangecounty.craigslist.org/search/hhh?query=superior+newport+beach&minAsk=min&maxAsk=1350"></textarea>
+			    <div style="margin-top:15px;"></div>
+				<button type="submit" class="btn btn-primary btn-large">Go</button>
 		    </fieldset>
 	    </form>
 	</div>
 </div>
 </div>
+
+<script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='bootstrap/js/bootstrap.js') }}"></script>
+<script src="{{ url_for('static', filename='expanding.js') }}"></script>
 </body>
 </html>
