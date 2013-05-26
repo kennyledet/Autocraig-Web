@@ -28,16 +28,6 @@
 		    <fieldset>
 			    <em><legend class="text-info">New Task</legend></em>
 
-			    <div class="input-append">
-				    <label>Your Email</label>
-				    <input class="input-xlarge" type="text" placeholder="you@gmail.com">
-
-				    <label class="checkbox">
-				    	<input type="checkbox"> <p class="text-info">Send me reports</p>
-				    </label>
-			    </div>
-			    <div></div>
-
 			    <button class="btn btn-primary">Choose Messages</button>
 			    <div></div>
 
@@ -49,9 +39,9 @@
 			    <div style="margin-top:15px;"></div>
 
 			    <label>Scrape URLS</label>
-			    <textarea class="input-xxlarge expanding" type="text" placeholder="http://orangecounty.craigslist.org/search/hhh?query=superior+newport+beach&minAsk=min&maxAsk=1350"></textarea>
-			    <div style="margin-top:15px;"></div>
-				<button type="submit" class="btn btn-primary btn-large">Go</button>
+			    <textarea id="urls" class="input-xxlarge expanding" type="text" placeholder="http://orangecounty.craigslist.org/search/hhh?query=superior+newport+beach&minAsk=min&maxAsk=1350"></textarea>
+			    <div style="margin-top:50px;"></div>
+				<button id="go" type="submit" class="btn btn-primary btn-large">Go</button>
 		    </fieldset>
 	    </form>
 	</div>
@@ -61,5 +51,31 @@
 <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.js') }}"></script>
 <script src="{{ url_for('static', filename='expanding.js') }}"></script>
+<script type="text/javascript">
+	$('#go').click(function() {
+		if ( $('#urls').val().split('\n')[0] != null ) {
+            alert(1);
+
+			$.ajax({
+				url: '/go',
+				type: 'POST',
+				dataType: 'json',
+				data: {urls:  $('#urls').val()},
+				complete: function(xhr, textStatus) {
+				
+				},
+				success: function(data, textStatus, xhr) {
+				    alert(data.result);
+				},
+				error: function(xhr, textStatus, errorThrown) {
+				//called when there is an error
+				}
+			});
+			
+		}
+
+	});
+</script>
+
 </body>
 </html>

@@ -24,6 +24,13 @@ label {
 }
 
 .input-xxlarge {
-	height: 35px;
+	height: 100%;
 	width: 75%;
+
+}
+
+textarea, .textareaClone {
+	min-height: 6em;
+	padding: 1em;
+	margin-bottom: 10px; 
 }
