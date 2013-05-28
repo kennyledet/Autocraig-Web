@@ -1,20 +1,5 @@
-<!doctype html>
-<html lang="en">
-<head>
-	<title>AutoCraig-Web</title>
-	<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}" />
-	<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
-</head>
-<body class="container-fluid">
-<div class="container-narrow">
-	<div class="masthead">
-		<h3 class="muted">AutoCraig Web Interface</h3>
-	</div>
-	<hr></hr>
-</div>
-
-<!-- content -->
-<div class="container-fluid">
+{% extends "base.html" %}
+{% block main %}
 <div class="row-fluid">
 	<div class="span2 well sidebar-nav">
 		<ul class="nav nav-list">
@@ -39,11 +24,14 @@
 				    <label>To</label>
 				    <input id="toAddress" class="input-xlarge" type="text" placeholder="them@gmail.com">
 
+				    <label>Subject</label>
+				    <input id="subject" class="input-xlarge" type="text" placeholder="Subject">
+
 			    </div>
 			    <div></div>
 
 			    <label>Message Content</label>
-			    <textarea id="body" class="input-xxlarge expanding" type="text"></textarea>
+			    <textarea id="content" class="input-xxlarge expanding" type="text"></textarea>
 			    <div style="margin-top:50px;"></div>
 
 				<button id="addMessage" type="submit" class="btn btn-primary btn-large">Add</button>
@@ -51,12 +39,10 @@
 		</form>
 	</div>
 </div>
-</div>
+{% endblock %}
 
 <!-- js -->
-<script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
-<script src="{{ url_for('static', filename='bootstrap/js/bootstrap.js') }}"></script>
-<script src="{{ url_for('static', filename='expanding.js') }}"></script>
+{% block js %}
 <script type="text/javascript">
 $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 $('#addMessage').click(function(event) {
@@ -65,8 +51,9 @@ $('#addMessage').click(function(event) {
 	$.getJSON($SCRIPT_ROOT + '/_new_message', {
 		fromAddress: $('#fromAddress').val(),
 		toAddress: $('#toAddress').val(),
-		body: $('#body').val(),
-		reports: $('#reportsEnabled').val()
+		body: $('#content').val(),
+		reports: $('#reportsEnabled').val(),
+		subject: $('#subject').val()
 	}, function(data) {
 		//alert(data.result); // 1 or 0
 	});
@@ -74,6 +61,7 @@ $('#addMessage').click(function(event) {
 	
 });
 </script>
+{% endblock %}
 
 </body>
 </html>

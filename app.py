@@ -8,7 +8,8 @@ import models
 # Routes
 @app.route('/')
 def index():
-    return render_template('index.html')
+    messages = models.Message.query.all()
+    return render_template('index.html', messages=messages)
 
 @app.route('/messages')
 def messages():
