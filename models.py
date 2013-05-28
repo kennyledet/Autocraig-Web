@@ -14,7 +14,7 @@ class Message(db.Model):
     toAddress   = db.Column(db.String(255))
     fromAddress = db.Column(db.String(255))
     subject     = db.Column(db.String(255))
-    body        = db.Column(db.Text())
+    body        = db.Column(db.Integer)
 
     reportsEnabled = db.Column(db.Boolean())
 
