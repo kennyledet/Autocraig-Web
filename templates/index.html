@@ -41,10 +41,11 @@
 	<div class="modal-body">
 		<table class="table table-condensed table-striped">
 			<thead>
-				<th>Subject</th><th>Body</th><th>From</th><th>Reports Enabled?</th>
+				<th></th><th>Subject</th><th>Body</th><th>From</th><th>Reports Enabled?</th>
 			</thead>
 			{% for message in messages %}
-				<tr id="{{ message.id }}">
+				<tr>
+					<td><input id="{{ message.id }}" type="checkbox"/></td>
 					<td>{{ message.subject }}</td><td>{{ message.body }}</td><td>{{ message.fromAddress }}</td><td>{{ message.reportsEnabled }}</td>
 				</tr>
 			{% endfor %}
