@@ -22,14 +22,14 @@ def go():
 
 @app.route('/_new_message')
 def new_message():
-    toAddress   = request.args.get('toAddress',   0, type=str)
     fromAddress = request.args.get('fromAddress', 0, type=str)
+    print fromAddress
     subject     = request.args.get('subject',     0, type=str)
     body        = request.args.get('body',        0, type=str)
-    reportsEnabled = 1 if request.args.get('reportsEnabled', 0, type=str) == 'on' else 0
+    reportsEnabled = True if request.args.get('reportsEnabled', 0, type=str) == 'on' else False
 
     try:
-        message = models.Message(toAddress, fromAddress, subject, body, reportsEnabled)
+        message = models.Message(fromAddress, subject, body, reportsEnabled)
         models.db.session.add(message)
         models.db.session.commit()
     except Exception, e:

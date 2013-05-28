@@ -45,7 +45,7 @@
 			</thead>
 			{% for message in messages %}
 				<tr id="{{ message.id }}">
-					<td>{{ message.subject }}</td><td>{{ message.body }}</td><td>{{ message.from }}</td><td>{{ message.reportsEnabled }}</td>
+					<td>{{ message.subject }}</td><td>{{ message.body }}</td><td>{{ message.fromAddress }}</td><td>{{ message.reportsEnabled }}</td>
 				</tr>
 			{% endfor %}
 		</table>

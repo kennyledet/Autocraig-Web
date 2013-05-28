@@ -21,9 +21,6 @@
 				    	<input id="reportsEnabled" type="checkbox"> <p class="text-info">Send me reports</p>
 				    </label>
 
-				    <label>To</label>
-				    <input id="toAddress" class="input-xlarge" type="text" placeholder="them@gmail.com">
-
 				    <label>Subject</label>
 				    <input id="subject" class="input-xlarge" type="text" placeholder="Subject">
 
@@ -50,10 +47,9 @@ $('#addMessage').click(function(event) {
 	// post ajax request to add message to db
 	$.getJSON($SCRIPT_ROOT + '/_new_message', {
 		fromAddress: $('#fromAddress').val(),
-		toAddress: $('#toAddress').val(),
+		subject: $('#subject').val(),
 		body: $('#content').val(),
-		reports: $('#reportsEnabled').val(),
-		subject: $('#subject').val()
+		reportsEnabled: $('#reportsEnabled').val(),
 	}, function(data) {
 		//alert(data.result); // 1 or 0
 	});
