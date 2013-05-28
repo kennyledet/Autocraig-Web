@@ -53,27 +53,25 @@
 </div>
 </div>
 
+<!-- js -->
 <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.js') }}"></script>
 <script src="{{ url_for('static', filename='expanding.js') }}"></script>
 <script type="text/javascript">
+$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 $('#addMessage').click(function(event) {
 	event.preventDefault();
-	alert($('#fromAddress').val() + $('#toAddress').val() + $('#reportsEnabled').val() + $('#body').val());
-
-	$.ajax({
-		url: '/_new_message',
-		type: 'POST',
-		dataType: 'json',
-		data: {fromAddress: $('#fromAddress').val(), toAddress: $('#toAddress').val(), body: $('#body').val(), 
-				reports: $('#reportsEnabled').val() },
-		success: function(data, textStatus, xhr) {
-		    alert(data);
-		},
-		error: function(xhr, textStatus, errorThrown) {
-		//called when there is an error
-		}
+	// post ajax request to add message to db
+	$.getJSON($SCRIPT_ROOT + '/_new_message', {
+		fromAddress: $('#fromAddress').val(),
+		toAddress: $('#toAddress').val(),
+		body: $('#body').val(),
+		reports: $('#reportsEnabled').val()
+	}, function(data) {
+		//alert(data.result); // 1 or 0
 	});
+	return false;
+	
 });
 </script>
 

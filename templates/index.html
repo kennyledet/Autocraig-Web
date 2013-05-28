@@ -28,7 +28,7 @@
 		    <fieldset>
 			    <em><legend class="text-info">New Task</legend></em>
 
-			    <button class="btn btn-primary">Choose Messages</button>
+			    <a href="#chooseMessagesModal" role="button" class="btn btn-primary" data-toggle="modal">Choose Messages</a>
 			    <div></div>
 
 			    <div class="input-prepend input-append" style="margin-top:10px;">
@@ -48,6 +48,23 @@
 </div>
 </div>
 
+<!-- modals -->
+<div id="chooseMessagesModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="chooseMessagesModalLabel" aria-hidden="true">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		<h3 id="chooseMessagesModal">Choose Messages</h3>
+	</div>
+	<div class="modal-body">
+		<p>One fine body…</p>
+	</div>
+	<div class="modal-footer">
+		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+		<button class="btn btn-primary">Save changes</button>
+	</div>
+</div>
+
+
+<!-- js -->
 <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.js') }}"></script>
 <script src="{{ url_for('static', filename='expanding.js') }}"></script>
