@@ -39,13 +39,16 @@
 		<h3 id="chooseMessagesModal">Choose Messages</h3>
 	</div>
 	<div class="modal-body">
-		<ul>
+		<table class="table table-condensed table-striped">
+			<thead>
+				<th>Subject</th><th>Body</th><th>From</th><th>Reports Enabled?</th>
+			</thead>
 			{% for message in messages %}
-			<p>Subject: {{ message.subject }}</p>
-			<p>Body: {{ message.body }}</p>
-			{{ message.id }}
+				<tr id="{{ message.id }}">
+					<td>{{ message.subject }}</td><td>{{ message.body }}</td><td>{{ message.from }}</td><td>{{ message.reportsEnabled }}</td>
+				</tr>
 			{% endfor %}
-		</ul>
+		</table>
 	</div>
 	<div class="modal-footer">
 		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>

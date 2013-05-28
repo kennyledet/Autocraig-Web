@@ -26,7 +26,7 @@ def new_message():
     fromAddress = request.args.get('fromAddress', 0, type=str)
     subject     = request.args.get('subject',     0, type=str)
     body        = request.args.get('body',        0, type=str)
-    reportsEnabled = request.args.get('reportsEnabled', 0, type=str) == 'on'
+    reportsEnabled = 1 if request.args.get('reportsEnabled', 0, type=str) == 'on' else 0
 
     try:
         message = models.Message(toAddress, fromAddress, subject, body, reportsEnabled)
