@@ -45,7 +45,7 @@
 			</thead>
 			{% for message in messages %}
 				<tr>
-					<td><input id="{{ message.id }}" type="checkbox"/></td>
+					<td><input class="message-selection" id="{{ message.id }}" type="checkbox"/></td>
 					<td>{{ message.subject }}</td><td>{{ message.body }}</td><td>{{ message.fromAddress }}</td><td>{{ message.reportsEnabled }}</td>
 				</tr>
 			{% endfor %}
@@ -53,22 +53,35 @@
 	</div>
 	<div class="modal-footer">
 		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-		<button class="btn btn-primary">Save changes</button>
 	</div>
 </div>
 {% endblock %}
 
 <!-- js -->
 {% block js %}
-<script src="{{ url_for('static', filename='expanding.js') }}"></script>
 <script type="text/javascript">
-	$('#go').click(function() {
-		if ( $('#urls').val().split('\n')[0] != null ) {
-            
-			
-		}
+$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 
-	});
+$('#go').click(function(event) {
+	event.preventDefault();
+	if ( $('#urls').val().split('\n')[0] != null ) {  // post ajax request to start sending messages
+		var selectedMessages = '';
+		$('.message-selection').each(function() {
+			if ( $(this).is(':checked') )
+				selectedMessages += $(this).prop('id') + ',';
+		});
+
+		$.getJSON($SCRIPT_ROOT + '/_go', {
+			selectedMessages: selectedMessages,
+			urls: $('#urls').val(),
+			sleepTime: $('#sleep-time').val(),
+		}, function(data) {
+			//alert(data.result); // 1 or 0
+		});
+		
+	};
+	return false;
+});
 </script>
 {% endblock %}
 </body>

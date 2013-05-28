@@ -17,16 +17,20 @@ def messages():
 
 @app.route('/_go')
 def go():
-    urls = request.args.get('urls', 0, type=str)
+    selectedMessages = request.args.get('selectedMessages', 0, type=str)[0:-1].split()
+    sleepTime        = request.args.get('sleepTime', 0, type=int)
+    urls             = request.args.get('urls', 0, type=str)
+
+    print selectedMessages
+
     return jsonify()
 
 @app.route('/_new_message')
 def new_message():
-    fromAddress = request.args.get('fromAddress', 0, type=str)
-    print fromAddress
-    subject     = request.args.get('subject',     0, type=str)
-    body        = request.args.get('body',        0, type=str)
-    reportsEnabled = True if request.args.get('reportsEnabled', 0, type=str) == 'on' else False
+    fromAddress    = request.args.get('fromAddress', 0, type=str)
+    subject        = request.args.get('subject',     0, type=str)
+    body           = request.args.get('body',        0, type=str)
+    reportsEnabled = request.args.get('reportsEnabled', 0, type=str) == 'on'
 
     try:
         message = models.Message(fromAddress, subject, body, reportsEnabled)
