@@ -32,7 +32,7 @@ def attachment(filename):
 
 class Mailer:
     def __init__(self, server='localhost', verbose=False):
-        self.server = server
+        self.server  = server
         self.verbose = verbose
         
     def compose(self, to_addrs=[], from_addr='', subject='', message='', cc_addrs=[], 
@@ -48,10 +48,10 @@ class Mailer:
             msg = MIMEMultipart()
         
         # should be refactored
-        msg['To'] = ','.join(to_addrs)
+        msg['To']   = ','.join(to_addrs)
         msg['From'] = from_addr
         if cc_addrs:
-            msg['Cc'] = ','.join(cc_addrs)
+            msg['Cc']  = ','.join(cc_addrs)
         msg['Subject'] = subject
         msg['Date'] = Utils.formatdate(localtime=1)
         msg['Message-ID'] = Utils.make_msgid()

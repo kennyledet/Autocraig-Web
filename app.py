@@ -4,6 +4,7 @@ import os
 app = Flask(__name__)
 
 import models
+import tasks
 
 # Routes
 @app.route('/')
@@ -19,9 +20,9 @@ def messages():
 def go():
     selectedMessages = request.args.get('selectedMessages', 0, type=str)[0:-1].split()
     sleepTime        = request.args.get('sleepTime', 0, type=int)
-    urls             = request.args.get('urls', 0, type=str)
+    urls             = request.args.get('urls', 0, type=str).split('\n')
 
-    print selectedMessages
+    tasks.autocraig.delay(selectedMessages, sleepTime, urls)
 
     return jsonify()
 
