@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block main %}
 <div class="pure-u" id="list"><!-- col2 -->
-    <div class="content">
+    <div id="email-list" class="content">
     	<!-- display messages -->
     	{% for message in messages %}
         <div id="{{ message.id }}" class="email-item pure-g">
             <div class="pure-u-3-4">
-                <h5 class="email-name">Created: {{ message.created_at.strftime('%a %Y-%m-%d at %H:%m') }}</h5>
+                <h5 class="email-name">Created: {{ message.created_at.strftime('%a %Y-%m-%d at %H:%M') }}</h5>
                 <h4 class="email-subject">{{ message.subject }}</h4>
                 <p class="email-desc">{{ message.body }}</p>
             </div>
@@ -22,7 +22,7 @@
         <div class="pure-r">
             <h1 class="email-content-title">New Message</h1>
             <p class="email-content-subtitle">
-                <span>{{ datetime.strftime('%a %Y-%m-%d, %H:%m') }}</span>
+                <span>{{ datetime.strftime('%a %Y-%m-%d, %H:%M') }}</span>
             </p>
         </div>
 	</div>
@@ -30,10 +30,10 @@
         <form class="pure-form">
             <fieldset>
                     <label>From</label>
-                    <input id="fromAddress" class="input-xlarge" type="text" placeholder="you@gmail.com">
+                    <input id="fromAddress" class="input-xlarge" type="text" placeholder="you@mail.com">
 
                     <label>CC</label>
-                    <input id="ccAddress" class="input-xlarge" type="text" placeholder="you@gmail.com">
+                    <input id="ccAddress" class="input-xlarge" type="text" placeholder="cc@mail.com">
 
                     <p><label>Send me reports<input id="reportsEnabled" type="checkbox"> </label></p>
 

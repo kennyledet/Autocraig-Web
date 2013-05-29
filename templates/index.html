@@ -6,7 +6,7 @@
     	{% for message in messages %}
         <div id="{{ message.id }}" class="email-item pure-g">
             <div class="pure-u-3-4">
-                <h5 class="email-name">Created: {{ message.created_at.strftime('%a %Y-%m-%d at %H:%m') }}</h5>
+                <h5 class="email-name">Created: {{ message.created_at.strftime('%a %Y-%m-%d at %H:%M') }}</h5>
                 <h4 class="email-subject">{{ message.subject }}</h4>
                 <p class="email-desc">{{ message.body }}</p>
             </div>
@@ -22,7 +22,7 @@
         <div class="pure-r">
             <h1 class="email-content-title">New Task</h1>
             <p class="email-content-subtitle">
-                <span>{{ datetime.strftime('%a %Y-%m-%d, %H:%m') }}</span>
+                <span>{{ datetime.strftime('%a %Y-%m-%d, %H:%M') }}</span>
             </p>
         </div>
 	</div>

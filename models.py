@@ -29,11 +29,12 @@ class Message(db.Model):
     def __repr__(self):
         return '<Subject %r>' % self.subject
 
-class Report(object):
+"""
+class Report(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created_at  = db.Column(db.DateTime())
 
     def __init__(self, arg):
         super(Report, self).__init__()
         self.arg = arg
-        
+"""

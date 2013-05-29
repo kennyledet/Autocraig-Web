@@ -1,7 +1,7 @@
 from  flask import Flask, render_template, request, jsonify, Response, url_for
 app = Flask(__name__)
 
-import os, datetime
+import os, datetime, time
 import models
 import tasks
 
@@ -14,7 +14,7 @@ def index():
 @app.route('/messages')
 def messages():
     messages = models.Message.query.all()
-    return render_template('messages.html', messages=models.Message.query.all(), messageCount=len(messages), datetime=datetime.datetime.now())
+    return render_template('messages.html', messages=messages, messageCount=len(messages), datetime=datetime.datetime.now())
 
 @app.route('/_go')
 def go():
@@ -47,7 +47,8 @@ def new_message():
     finally:
         return jsonify(result=result)
 
-@app.route('_upload', methods=['GET', 'POST'])
+"""
+@app.route('/_upload', methods=['GET', 'POST'])
 def upload():
     if request.method == 'GET':
         # return a list of dicts with info about already available files:
@@ -66,7 +67,7 @@ def upload():
         fileSize = os.path.getsize('uploads/{}'.format(fileName))
         fileURL  = url_for('uploads', filename=fileName)
         return jsonify(name=fileName, size=fileSize, url=fileURL)
-
+"""
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
