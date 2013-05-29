@@ -8,13 +8,15 @@ import tasks
 # Routes
 @app.route('/')
 def index():
-    messages = models.Message.query.all()
-    return render_template('index.html', messages=messages, datetime=datetime.datetime.now())
+    messages     = models.Message.query.all()
+    messageCount = len(messages)
+    return render_template('index.html', messages=messages, messageCount=messageCount, datetime=datetime.datetime.now())
 
 @app.route('/messages')
 def messages():
-    messages = models.Message.query.all()
-    return render_template('messages.html', messages=messages, datetime=datetime.datetime.now())
+    messages     = models.Message.query.all()
+    messageCount = len(messages)
+    return render_template('messages.html', messages=messages, messageCount=messageCount, datetime=datetime.datetime.now())
 
 @app.route('/_go')
 def go():
