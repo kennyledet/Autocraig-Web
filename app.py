@@ -1,8 +1,7 @@
-from flask import Flask, render_template, request, jsonify, Response
-import os
-
+from  flask import Flask, render_template, request, jsonify, Response
 app = Flask(__name__)
 
+import os
 import models
 import tasks
 
@@ -14,27 +13,31 @@ def index():
 
 @app.route('/messages')
 def messages():
+    messages = models.Message.query.all()
     return render_template('messages.html')
 
 @app.route('/_go')
 def go():
     selectedMessages = request.args.get('selectedMessages', 0, type=str)[0:-1].split()
-    sleepTime        = request.args.get('sleepTime', 0, type=int)
-    urls             = request.args.get('urls', 0, type=str).split('\n')
+    urls             = request.args.get('urls',             0, type=str).split('\n')
 
-    tasks.autocraig.delay(selectedMessages, sleepTime, urls)
+    sleepTime        = request.args.get('sleepTime',        0, type=int)
+    sleepAmt         = request.args.get('sleepAmt',         0, type=int)
+
+    #tasks.autocraig.delay(selectedMessages, sleepTime, urls)
 
     return jsonify()
 
 @app.route('/_new_message')
 def new_message():
     fromAddress    = request.args.get('fromAddress', 0, type=str)
+    ccAddress      = request.args.get('ccAddress',   0, type=str)
     subject        = request.args.get('subject',     0, type=str)
     body           = request.args.get('body',        0, type=str)
     reportsEnabled = request.args.get('reportsEnabled', 0, type=str) == 'on'
 
     try:
-        message = models.Message(fromAddress, subject, body, reportsEnabled)
+        message = models.Message(fromAddress, ccAddress, subject, body, reportsEnabled)
         models.db.session.add(message)
         models.db.session.commit()
     except Exception, e:

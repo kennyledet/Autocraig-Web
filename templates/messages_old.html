@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="row-fluid">
+    <div class="span2 well sidebar-nav">
+        <ul class="nav nav-list">
+            <li class="nav-header">Control Panel</li>
+            <li><a href="/">New Task</a></li>
+            <li class="active"><a href="/messages">Custom Messages</a></li>
+        </ul>
+    </div>
+    <div class="span10 well">
+        <form>
+            <fieldset>
+                <em><legend class="text-info">New Message</legend></em>
+
+                <div class="input-append">
+                    <label>From</label>
+                    <input id="fromAddress" class="input-xlarge" type="text" placeholder="you@gmail.com">
+
+                    <label class="checkbox">
+                        <input id="reportsEnabled" type="checkbox"> <p class="text-info">Send me reports</p>
+                    </label>
+
+                    <label>Subject</label>
+                    <input id="subject" class="input-xlarge" type="text" placeholder="Subject">
+
+                </div>
+                <div></div>
+
+                <label>Message Content</label>
+                <textarea id="content" class="input-xxlarge expanding" type="text"></textarea>
+                <div style="margin-top:50px;"></div>
+
+                <button id="addMessage" type="submit" class="btn btn-primary btn-large">Add</button>
+            </fieldset>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+<!-- js -->
+{% block js %}
+<script type="text/javascript">
+$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+$('#addMessage').click(function(event) {
+    event.preventDefault();
+    // post ajax request to add message to db
+    $.getJSON($SCRIPT_ROOT + '/_new_message', {
+        fromAddress: $('#fromAddress').val(),
+        subject: $('#subject').val(),
+        body: $('#content').val(),
+        reportsEnabled: $('#reportsEnabled').val(),
+    }, function(data) {
+        //alert(data.result); // 1 or 0
+    });
+    return false;
+    
+});
+</script>
+{% endblock %}
+
+</body>
+</html>

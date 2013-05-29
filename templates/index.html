@@ -4,20 +4,14 @@
     <div class="content">
     	<!-- display messages -->
     	{% for message in messages %}
-
         <div id="{{ message.id }}" class="email-item pure-g">
-
             <div class="pure-u-3-4">
                 <h5 class="email-name">Created: {{ message.created_at }}</h5>
                 <h4 class="email-subject">{{ message.subject }}</h4>
-                <p class="email-desc">
-                    {{ message.body }}
-                </p>
+                <p class="email-desc">{{ message.body }}</p>
             </div>
         </div>
-
         {% endfor %}
-
     </div>
 </div>
 

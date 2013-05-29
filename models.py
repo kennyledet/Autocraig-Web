@@ -14,12 +14,14 @@ class Message(db.Model):
     fromAddress = db.Column(db.String(255))
     subject     = db.Column(db.String(255))
     body        = db.Column(db.String(255))
+    ccAddress   = db.Column(db.String(255))
 
     reportsEnabled = db.Column(db.Boolean())
 
-    def __init__(self, fromAddress, subject, body, reportsEnabled):
+    def __init__(self, fromAddress, ccAddress, subject, body, reportsEnabled):
         self.created_at  = datetime.datetime.now()
         self.fromAddress = fromAddress
+        self.ccAddress   = ccAddress
         self.subject     = subject
         self.body        = body
         self.reportsEnabled = reportsEnabled
