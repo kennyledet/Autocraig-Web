@@ -1,7 +1,7 @@
 from  flask import Flask, render_template, request, jsonify, Response
 app = Flask(__name__)
 
-import os
+import os, datetime
 import models
 import tasks
 
@@ -9,12 +9,12 @@ import tasks
 @app.route('/')
 def index():
     messages = models.Message.query.all()
-    return render_template('index.html', messages=messages)
+    return render_template('index.html', messages=messages, datetime=datetime.datetime.now())
 
 @app.route('/messages')
 def messages():
     messages = models.Message.query.all()
-    return render_template('messages.html')
+    return render_template('messages.html', messages=messages, datetime=datetime.datetime.now())
 
 @app.route('/_go')
 def go():

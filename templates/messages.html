@@ -22,7 +22,7 @@
         <div class="pure-r">
             <h1 class="email-content-title">New Message</h1>
             <p class="email-content-subtitle">
-                at <span>2:54am, May 29, 2013</span>
+                <span>{{ datetime.strftime('%a %Y-%m-%d, %H:%m') }}</span>
             </p>
         </div>
 	</div>
@@ -68,7 +68,7 @@ $('#addMessage').click(function(event) {
 		subject: 	 $('#subject').val(),
 		body: 		 $('#content').val(),
 		reportsEnabled: $('#reportsEnabled').val(),
-		ccAddress: 	 $('#ccAddress'),
+		ccAddress: 	 $('#ccAddress').val(),
 	}, function(data) {
 		//alert(data.result); // 1 or 0
 	});
