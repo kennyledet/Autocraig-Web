@@ -1,6 +1,17 @@
 {% extends "base.html" %}
 {% block main %}
-    <div class="pure-u" id="list"><!-- col2 -->
+    <div id="menu" class="pure-u"><!-- col1 -->
+        <div class="pure-menu pure-menu-open">
+            <a class="pure-menu-heading" href="/"></a>
+            <ul class="nav nav-list">
+                <li class="nav-header">Control Panel</li>
+                <li class="active"><a href="/" class="pure-button pure-button-primary">New Task</a></li>
+                <li><a href="/messages" class="pure-button">Custom Messages</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="pure-u" id="list">
         <div class="content">
             <div class="email-item email-item-selected pure-g">
                 <div class="pure-u">
@@ -103,64 +114,54 @@
     </div>
 
 
-<div class="pure-u" id="main">
-<div class="content">
-<div class="email-content pure-r">
-	<div class="email-content-header pure-r"><!-- col3-->
-        <div class="pure-r">
-            <h1 class="email-content-title">New Task</h1>
-            <p class="email-content-subtitle">
-                at <span>2:25am, May 29, 2013</span>
-            </p>
-        </div>
-	</div>
-    <div class="email-content-body pure-u-1">
-    <form class="pure-form">
-	    <fieldset>
-		    <a href="#chooseMessagesModal" role="button" class="pure-button" data-toggle="modal">Choose Messages</a>
-		    <div></div>
 
-		    <div style="margin-top:10px;">
-			    <span class="add-on">Rerun every</span>
-			    <input class="span2" id="sleep-time" type="text" placeholder="0"/>
-			    <span class="add-on">seconds</span>
-			</div>
-		    <div style="margin-top:15px;"></div>
 
-		    <label>Scrape URLS</label>
-		    <textarea id="urls" class="input-xxlarge expanding" type="text" placeholder="http://orangecounty.craigslist.org/search/hhh?query=superior+newport+beach&minAsk=min&maxAsk=1350"></textarea>
-		    <div style="margin-top:50px;"></div>
-			<button id="go" type="submit" class="pure-button pure-button-primary">Go</button>
-	    </fieldset>
-    </form>
+    <div class="pure-u"><!-- col3-->
+        <form class="pure-form">
+            <fieldset>
+                <em><legend class="text-info">New Task</legend></em>
+
+                <a href="#chooseMessagesModal" role="button" class="pure-button" data-toggle="modal">Choose Messages</a>
+                <div></div>
+
+                <div class="input-prepend input-append" style="margin-top:10px;">
+                    <span class="add-on">Rerun every</span>
+                    <input class="span2" id="sleep-time" type="text" placeholder="0"/>
+                    <span class="add-on">seconds</span>
+                </div>
+                <div style="margin-top:15px;"></div>
+
+                <label>Scrape URLS</label>
+                <textarea id="urls" class="input-xxlarge expanding" type="text" placeholder="http://orangecounty.craigslist.org/search/hhh?query=superior+newport+beach&minAsk=min&maxAsk=1350"></textarea>
+                <div style="margin-top:50px;"></div>
+                <button id="go" type="submit" class="pure-button pure-button-primary">Go</button>
+            </fieldset>
+        </form>
     </div>
-</div>
-</div>
-</div>
 
 <!-- modals -->
 <!--
 <div id="chooseMessagesModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="chooseMessagesModalLabel" aria-hidden="true">
-	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-		<h3 id="chooseMessagesModal">Choose Messages</h3>
-	</div>
-	<div class="modal-body">
-		<table class="table table-condensed table-striped">
-			<thead>
-				<th></th><th>Subject</th><th>Body</th><th>From</th><th>Reports Enabled?</th>
-			</thead>
-			{% for message in messages %}
-				<tr>
-					<td><input class="message-selection" id="{{ message.id }}" type="checkbox"/></td>
-					<td>{{ message.subject }}</td><td>{{ message.body }}</td><td>{{ message.fromAddress }}</td><td>{{ message.reportsEnabled }}</td>
-				</tr>
-			{% endfor %}
-		</table>
-	</div>
-	<div class="modal-footer">
-		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-	</div>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="chooseMessagesModal">Choose Messages</h3>
+    </div>
+    <div class="modal-body">
+        <table class="table table-condensed table-striped">
+            <thead>
+                <th></th><th>Subject</th><th>Body</th><th>From</th><th>Reports Enabled?</th>
+            </thead>
+            {% for message in messages %}
+                <tr>
+                    <td><input class="message-selection" id="{{ message.id }}" type="checkbox"/></td>
+                    <td>{{ message.subject }}</td><td>{{ message.body }}</td><td>{{ message.fromAddress }}</td><td>{{ message.reportsEnabled }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
 -->
 {% endblock %}
 
@@ -170,24 +171,24 @@
 $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 
 $('#go').click(function(event) {
-	event.preventDefault();
-	if ( $('#urls').val().split('\n')[0] != null ) {  // post ajax request to start sending messages
-		var selectedMessages = '';
-		$('.message-selection').each(function() {
-			if ( $(this).is(':checked') )
-				selectedMessages += $(this).prop('id') + ',';
-		});
+    event.preventDefault();
+    if ( $('#urls').val().split('\n')[0] != null ) {  // post ajax request to start sending messages
+        var selectedMessages = '';
+        $('.message-selection').each(function() {
+            if ( $(this).is(':checked') )
+                selectedMessages += $(this).prop('id') + ',';
+        });
 
-		$.getJSON($SCRIPT_ROOT + '/_go', {
-			selectedMessages: selectedMessages,
-			urls: $('#urls').val(),
-			sleepTime: $('#sleep-time').val(),
-		}, function(data) {
-			//alert(data.result); // 1 or 0
-		});
-		
-	};
-	return false;
+        $.getJSON($SCRIPT_ROOT + '/_go', {
+            selectedMessages: selectedMessages,
+            urls: $('#urls').val(),
+            sleepTime: $('#sleep-time').val(),
+        }, function(data) {
+            //alert(data.result); // 1 or 0
+        });
+        
+    };
+    return false;
 });
 </script>
 {% endblock %}

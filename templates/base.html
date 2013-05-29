@@ -1,25 +1,44 @@
 <!doctype html>
-<html lang="en">
+<html class="yui3-js-enabled wf-omnespro-n2-active wf-omnespro-n3-active wf-proximanova-n1-active wf-proximanova-n4-active wf-proximanova-n7-active wf-active" lang="en">
 <head>
-    <title>AutoCraig-Web</title>
-    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AutoCraig Web</title>
+
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/pure/0.1.0/pure-min.css">
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
 </head>
-<body class="container-fluid">
-<div class="container-narrow">
-    <div class="masthead">
-        <h3>AutoCraig Web Interface</h3>
+<body>
+<div class="pure-g-r content" id="layout"> <!-- core layout-->
+    <div class="pure-u" id="nav"><!-- navigation -->
+        <a href="#nav" class="nav-menu-button">Menu</a>
+
+        <div class="nav-inner">
+            <li class="pure-menu-heading">Control Panel</li>
+            <a class="pure-button primary-button" href="/">New Task</a>
+
+            <div class="pure-menu pure-menu-open">
+                <ul>
+                    <li><a href="/messages">Messages <span class="msg-count">(4)</span></a></li>
+                </ul>
+            </div>
+        </div>
+    </div><!-- /navigation -->
+
+
+    <!-- main content -->
+    <div class="pure-u" id="main">
+    {% block main %}
+
+    {% endblock %}
     </div>
-</div>
+    <!-- /main content -->
 
-<!-- main content -->
-<div class="container-fluid">
-{% block main %}
 
-{% endblock %}
-</div>
-<!-- /main content -->
 
+</div><!-- /core layout -->
 <!-- js -->
 <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.js') }}"></script>
