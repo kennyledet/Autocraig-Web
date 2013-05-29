@@ -27,8 +27,9 @@ class MainProc(object):
                             'DEEP'  : 1,
                             'VALID' : 15,
                             'SIMILARITY' : 0.9})
+
         self.duplicates_file = 'autocraig.duplicates'
-    
+
     def start(self, search_url, msg, quiet=False):
         duplicates = self.load_duplicates()
         posts      = self.get_all_posts(search_url, duplicates)
@@ -37,10 +38,9 @@ class MainProc(object):
 
         # report an hrml if needed
         if self.config['REPORTS_ENABLED']:
-            print 1
             self.email_digest(posts)
         # email all authors
-        self.email_authors(posts, msg)
+        #self.email_authors(posts, msg)
         # output result to stdout
         if not quiet:
             print self.report(posts),
@@ -129,7 +129,7 @@ class MainProc(object):
         s = ''
         for post in posts:
             if html:
-                info = '<a href="%s">source</a>' % post['url']
+                info = '<a href="{}">{}</a>'.format(post['url'], post['craig_id'])
                 sep  = '<hr>\n'
                 desc = 'description_html'
             else:
@@ -193,13 +193,16 @@ class MainProc(object):
         return 1.0 * score / norm
 
     def send_email(self, fromAddress, toAddress, subject, body, CC=None, HTML=False):
-        sender  = Mailer(host='smtp.gmail.com', port=587, use_tls=True, usr='kendrickledet@gmail', pwd='yMHJ0e78gMbDtkV')
-        message = Message(From=fromAddress, To=toAddress, Subject=subject, Body=body, CC=CC, charset="utf-8")
-        message.Subject = subject
-        # TODO below: check if html, attachment support
-        #message.Body = body
-        #message.Html = 'This is an <strong>HTML</strong> email!'
+        sender  = Mailer(host='smtp.gmail.com', port=587, use_tls=True, usr='kendrickledet', pwd='yMHJ0e78gMbDtkV')
+        message = Message(From=fromAddress, To=toAddress, Subject=subject, CC=CC, charset="utf-8")
+
+        if HTML:
+            message.Html = body
+        else:
+            message.Body = body
+
         #message.attach("kitty.jpg")
+        sender.send(message)
 
     
 def main():
