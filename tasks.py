@@ -11,7 +11,4 @@ def autocraig(selectedMessages, sleepTime, urls):
         for messageId in selectedMessages:
             print 'Sending message {}'.format(messageId)
             message = models.Message.query.filter_by(id=messageId).first()
-            reports = '--report' if message.reportsEnabled else ''
-            cmd     = 'python lib/autocraig.py {} --auto "{}" {}'.format(reports, message.body, url)
-
-            os.system(cmd)
+            ## start automation

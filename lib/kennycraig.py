@@ -1,6 +1,7 @@
 # Original Author : Alex Ksikes
 # Modifications   : Kendrick Ledet
 # - Gets the same job done in about 50 (nonredundant) less lines of code
+# - Replaces Alex K's send_mail.py with mailer module
 # requires 
 # - send_mail.py
 # - html2text.py
@@ -8,7 +9,7 @@
 import re, urllib, urlparse, datetime
 import html2text
 
-from send_mail import send_mail
+from mailer import Mailer, Message
 
 
 class MainProc(object):
@@ -107,15 +108,21 @@ class MainProc(object):
     def email_authors(self, posts, msg):
         for post in posts:
             print 'emailing {}'.format(post)
+            self.send_email(self.config['FROM_EMAIL'], post['reply'], 'Regarding your listing', msg, CC=self.config['CC_EMAIL'])
+            """
             send_mail(to_addrs=post['reply'], from_addrs=self.config['FROM_EMAIL'], 
                       cc_addrs=self.config['CC_EMAIL'].split(','), message=msg, subject=post['title'])
+            """
 
 
     def email_digest(self, posts):
         if not posts: return
+        self.send_email(self.config['FROM_EMAIL'], self.config['TO_EMAIL'], 'craigslist-auto-%s' % datetime.datetime.now(), self.report(posts, html=True), CC=self.config['CC_EMAIL'], HTML=True)
+        """
         send_mail(to_addrs=self.config['TO_EMAIL'].split(','), cc_addrs=self.config['CC_EMAIL'].split(','), 
                   message=self.report(posts, html=True), from_addr=self.config['FROM_EMAIL'],
                   content_type='text/html', subject='craigslist-auto-%s' % datetime.datetime.now())
+        """
           
 
     def report(self, posts, html=False):
@@ -183,9 +190,20 @@ class MainProc(object):
         if norm == 0:
             norm  = 1
             score = 0
-        return 1.0 * score / norm 
+        return 1.0 * score / norm
+
+    def send_email(self, fromAddress, toAddress, subject, body, CC=None, HTML=False):
+        sender  = Mailer(host='smtp.gmail.com', port=587, use_tls=True, usr='kendrickledet@gmail', pwd='yMHJ0e78gMbDtkV')
+        message = Message(From=fromAddress, To=toAddress, Subject=subject, Body=body, CC=CC, charset="utf-8")
+        message.Subject = subject
+        # TODO below: check if html, attachment support
+        #message.Body = body
+        #message.Html = 'This is an <strong>HTML</strong> email!'
+        #message.attach("kitty.jpg")
+
     
 def main():
+    # they see me hardcooooooodiiiiiin', they haaaaatin
     search_url = 'http://dallas.craigslist.org/search/?areaID=21&subAreaID=&query=BOOTY&catAbb=sss'
     msg        = """Hi there, I am interested in your posting. \n
                     Please get back to me if it's still available."""
