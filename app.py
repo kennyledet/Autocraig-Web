@@ -1,4 +1,4 @@
-from  flask import Flask, render_template, request, jsonify, Response
+from  flask import Flask, render_template, request, jsonify, Response, url_for
 app = Flask(__name__)
 
 import os, datetime
@@ -8,15 +8,13 @@ import tasks
 # Routes
 @app.route('/')
 def index():
-    messages     = models.Message.query.all()
-    messageCount = len(messages)
-    return render_template('index.html', messages=messages, messageCount=messageCount, datetime=datetime.datetime.now())
+    messages = models.Message.query.all()
+    return render_template('index.html', messages=messages, messageCount=len(messages), datetime=datetime.datetime.now())
 
 @app.route('/messages')
 def messages():
-    messages     = models.Message.query.all()
-    messageCount = len(messages)
-    return render_template('messages.html', messages=messages, messageCount=messageCount, datetime=datetime.datetime.now())
+    messages = models.Message.query.all()
+    return render_template('messages.html', messages=models.Message.query.all(), messageCount=len(messages), datetime=datetime.datetime.now())
 
 @app.route('/_go')
 def go():
@@ -26,7 +24,7 @@ def go():
     sleepTime        = request.args.get('sleepTime',        0, type=int)
     sleepAmt         = request.args.get('sleepAmt',         0, type=int)
 
-    #tasks.autocraig.delay(selectedMessages, sleepTime, urls)
+    #tasks.kennycraig.delay(selectedMessages, sleepTime, sleepAmt, urls)
 
     return jsonify()
 
@@ -49,6 +47,25 @@ def new_message():
     finally:
         return jsonify(result=result)
 
+@app.route('_upload', methods=['GET', 'POST'])
+def upload():
+    if request.method == 'GET':
+        # return a list of dicts with info about already available files:
+        filesInfo = []
+        for fileName in os.listdir('uploads'):
+            fileURL  = url_for('uploads', filename=fileName)
+            fileSize = os.path.getsize('uploads/{}'.format(fileName))
+            fileInfo.append({name: fileName, size: fileSize, url: fileURL})
+        return jsonify(files=filesInfo)
+    else:
+        data     = request.files.get('data_file')
+        fileName = data.filename
+
+        save_file(data, fileName)
+
+        fileSize = os.path.getsize('uploads/{}'.format(fileName))
+        fileURL  = url_for('uploads', filename=fileName)
+        return jsonify(name=fileName, size=fileSize, url=fileURL)
 
 
 if __name__ == '__main__':
