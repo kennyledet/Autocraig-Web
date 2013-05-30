@@ -64,16 +64,27 @@ $('#addMessage').click(function(event) {
 	event.preventDefault();
     latestMessageId = Number($('#email-list').children()[$('#email-list').children().length-1].id);
     newMessageId    = latestMessageId + 1;
-    alert(newMessageId);
+
+    var subject = $('#subject').val();
+    var body    = $('#content').val();
 	// post ajax request to add message to db
 	$.getJSON($SCRIPT_ROOT + '/_new_message', {
 		fromAddress: $('#fromAddress').val(),
-		subject: 	 $('#subject').val(),
-		body: 		 $('#content').val(),
+		subject: 	 subject,
+		body: 		 body,
 		reportsEnabled: $('#reportsEnabled').val(),
 		ccAddress: 	 $('#ccAddress').val(),
 	}, function(data) {
-		//alert(data.result); // 1 or 0
+
+		
+    $('#email-list').append('<div id="' + newMessageId + '" class="email-item pure-g">
+            <div class="pure-u-3-4">
+                <h3 class="email-name">Created: Just now..</h3>
+                <h4 class="email-subject">' + subject + '</h4>
+                <p class="email-desc">' + body + '</p>
+            </div>
+        </div>');
+
 	});
 	return false;
 });
