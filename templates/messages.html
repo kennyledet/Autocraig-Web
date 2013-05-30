@@ -62,6 +62,9 @@
 $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 $('#addMessage').click(function(event) {
 	event.preventDefault();
+    latestMessageId = Number($('#email-list').children()[$('#email-list').children().length-1].id);
+    newMessageId    = latestMessageId + 1;
+    alert(newMessageId);
 	// post ajax request to add message to db
 	$.getJSON($SCRIPT_ROOT + '/_new_message', {
 		fromAddress: $('#fromAddress').val(),
