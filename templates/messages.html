@@ -62,8 +62,13 @@
 $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 $('#addMessage').click(function(event) {
 	event.preventDefault();
-    latestMessageId = Number($('#email-list').children()[$('#email-list').children().length-1].id);
-    newMessageId    = latestMessageId + 1;
+    if ($('#email-list').children().length) {
+        latestMessageId = Number($('#email-list').children()[$('#email-list').children().length-1].id);
+    } else {
+        latestMessageId = 0;
+    }
+
+    newMessageId = latestMessageId + 1;
 
     var subject = $('#subject').val();
     var body    = $('#content').val();
@@ -76,11 +81,16 @@ $('#addMessage').click(function(event) {
 		ccAddress: 	 $('#ccAddress').val(),
 	   }, function(data) {
 
-    alert(newMessageId + subject + body);
+    var msgStr = ('<div id="'+newMessageId+'" class=email-item pure-g"><div class="pure-u-3-4"><h3 class="email-name">Created: Just now..</h3><h4 class="email-subject">'+subject+'</h4><p class="email-desc">'+body+'</p></div></div>');
 
-    var newEmail = ('<div id="'+newMessageId+'" class=email-item pure-g"><div class="pure-u-3-4"><h3 class="email-name">Created: Just now..</h3><h4 class="email-subject">'+subject+'</h4><p class="email-desc">'+body+'</p></div></div>');
-    $('#email-list').prepend(newEmail);
+    $('#email-list').prepend(msgStr);
+
+    // update email count
+    $('#email-count').text(Number($('#email-count').text()) + 1);
+
     });
+
+
 	return false;
 });
 </script>
