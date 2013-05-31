@@ -74,18 +74,13 @@ $('#addMessage').click(function(event) {
 		body: 		 body,
 		reportsEnabled: $('#reportsEnabled').val(),
 		ccAddress: 	 $('#ccAddress').val(),
-	}, function(data) {
+	   }, function(data) {
 
-		
-    $('#email-list').append('<div id="' + newMessageId + '" class="email-item pure-g">
-            <div class="pure-u-3-4">
-                <h3 class="email-name">Created: Just now..</h3>
-                <h4 class="email-subject">' + subject + '</h4>
-                <p class="email-desc">' + body + '</p>
-            </div>
-        </div>');
+    alert(newMessageId + subject + body);
 
-	});
+    var newEmail = ('<div id="'+newMessageId+'" class=email-item pure-g"><div class="pure-u-3-4"><h3 class="email-name">Created: Just now..</h3><h4 class="email-subject">'+subject+'</h4><p class="email-desc">'+body+'</p></div></div>');
+    $('#email-list').prepend(newEmail);
+    });
 	return false;
 });
 </script>
