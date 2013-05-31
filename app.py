@@ -1,9 +1,11 @@
+# Config
 from  flask import Flask, render_template, request, jsonify, Response, url_for
 app = Flask(__name__)
 
 import os, datetime, time
 import models
 import tasks
+
 
 # Routes
 @app.route('/')
@@ -18,13 +20,15 @@ def messages():
 
 @app.route('/_go')
 def go():
-    selectedMessages = request.args.get('selectedMessages', 0, type=str)[0:-1].split()
+    selectedMessages = request.args.get('selectedMessages', 0, type=str)[0:-1].split(',')
     urls             = request.args.get('urls',             0, type=str).split('\n')
 
     sleepTime        = request.args.get('sleepTime',        0, type=int)
     sleepAmt         = request.args.get('sleepAmt',         0, type=int)
 
-    #tasks.kennycraig.delay(selectedMessages, sleepTime, sleepAmt, urls)
+    print selectedMessages
+
+    tasks.start_task.delay(selectedMessages, urls, sleepTime, sleepAmt)
 
     return jsonify()
 

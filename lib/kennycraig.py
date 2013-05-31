@@ -6,44 +6,52 @@
 # - send_mail.py
 # - html2text.py
 
-import re, urllib, urlparse, datetime
+import re, urllib, urlparse, datetime, random
 import html2text
 
 from mailer import Mailer, Message
 
 
-class MainProc(object):
-    """Main process for running kennycraig"""
-    def __init__(self, config={
-                            'FROM_EMAIL'  : '',
-                            'REPLY_EMAIL' : '',
-                            'TO_EMAIL' : '',
-                            'CC_EMAIL' : '',
-                            'REPORTS_ENABLED': True}):
 
-        self.config = config
-        self.config.update({'NUM_DAYS'  : 3,
-                            'NUM_PAGES' : 3,
-                            'DEEP'  : 1,
-                            'VALID' : 15,
-                            'SIMILARITY' : 0.9})
+class AutoProcess(object):
+    """Main process for running kennycraig"""
+    def __init__(self):
+
+        self.config = {'NUM_DAYS'  : 3,
+                       'NUM_PAGES' : 3,
+                       'DEEP'  : 1,
+                       'VALID' : 15,
+                       'SIMILARITY' : 0.9}
 
         self.duplicates_file = 'autocraig.duplicates'
 
-    def start(self, search_url, msg, quiet=False):
-        duplicates = self.load_duplicates()
-        posts      = self.get_all_posts(search_url, duplicates)
+    def start(self, search_urls, messages, quiet=False):
+        for search_url in search_urls:
+            duplicates = self.load_duplicates()
+            posts      = self.get_all_posts(search_url, duplicates)
 
-        self.add_to_duplicates(posts)
+            self.add_to_duplicates(posts)
 
-        # report an hrml if needed
-        if self.config['REPORTS_ENABLED']:
-            self.email_digest(posts)
-        # email all authors
-        #self.email_authors(posts, msg)
-        # output result to stdout
-        if not quiet:
-            print self.report(posts),
+            for post in posts:
+                message = random.choice(messages)  # choose random message
+
+            # create report, store in Mongo collection. this can also be used to check for dupes
+            messageIds = [message.id for message in messages]
+            ads = [post['craig_id'] for post in posts]
+
+            print messageIds, ads
+            new_report(messageIds, ads)
+
+            """
+            # email all authors
+            self.email_authors(posts, msg)
+
+            if self.config['DIGEST_ENABLED']:
+                self.email_digest(posts)
+            """
+            # output result to stdout
+            if not quiet:
+                print self.report(posts),
 
 
     def load_duplicates(self):
@@ -206,17 +214,11 @@ class MainProc(object):
 
     
 def main():
-    # they see me hardcooooooodiiiiiin', they haaaaatin
     search_url = 'http://dallas.craigslist.org/search/?areaID=21&subAreaID=&query=BOOTY&catAbb=sss'
     msg        = """Hi there, I am interested in your posting. \n
                     Please get back to me if it's still available."""
 
-    proc = MainProc({'FROM_EMAIL'  : 'kendrickledet@gmail.com',
-                    'REPLY_EMAIL' : 'kendrickledet@gmail.com',
-                    'TO_EMAIL' : 'kendrickledet@gmail.com',
-                    'CC_EMAIL' : 'kendrickledet@gmail.com',
-                    'REPORTS_ENABLED': True})
-
+    proc = AutoProcess()
     proc.start(search_url, msg)
       
 if __name__ == '__main__':
