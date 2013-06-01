@@ -9,7 +9,6 @@ celery     = Celery('tasks', broker=BROKER_URL)
 @celery.task
 def start_task(selectedMessages, urls, sleepTime, sleepAmt):
     messages = []
-    print selectedMessages
     for messageId in map(int, selectedMessages):
         print messageId
         messages.append(models.Message.query.filter_by(id=messageId).first())
@@ -17,7 +16,7 @@ def start_task(selectedMessages, urls, sleepTime, sleepAmt):
     print 'Using messages: '
     print messages
 
-    process = AutoProcess()
-    process.start(urls, messages)
+    process = AutoProcess(urls, messages)
+    process.start()
 
 

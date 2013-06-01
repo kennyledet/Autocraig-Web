@@ -26,11 +26,13 @@ def go():
     sleepTime        = request.args.get('sleepTime',        0, type=int)
     sleepAmt         = request.args.get('sleepAmt',         0, type=int)
 
-    print selectedMessages
+    if not selectedMessages:
+        result = 0
+    else:
+        tasks.start_task.delay(selectedMessages, urls, sleepTime, sleepAmt)
+        result = 1
 
-    tasks.start_task.delay(selectedMessages, urls, sleepTime, sleepAmt)
-
-    return jsonify()
+    return jsonify(result=result)
 
 @app.route('/_new_message')
 def new_message():

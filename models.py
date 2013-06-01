@@ -36,10 +36,6 @@ class Message(db.Model):
     def __repr__(self):
         return '<Subject %r>' % self.subject
 
-def new_report(messages, ads):  # messages are Message ids, ads are craigslist posting ids
-    collection = connection['acw'].reports
-    collection.insert({'created_at': datetime.datetime.now(), 'messages': messages, 'ads': ads})
-
 def add_to_dupes(craigslist_id):
     collection = connection['acw'].dupes
     collection.insert({'craigslist_id': craigslist_id})
