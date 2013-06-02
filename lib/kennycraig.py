@@ -14,6 +14,7 @@ class AutoProcess(object):
         self.messages = messages
         self.reports  = models.connection['acw'].reports
 
+
     def start(self):
         posts     = list(chain.from_iterable([self.scrape_posts(url) for url in self.urls]))
         tmpReport = {}
@@ -30,8 +31,8 @@ class AutoProcess(object):
             # Email ad poster
             # self.send_email(message.fromAddress, post['toAddress'], message.subject, message.body, message.ccAddress)
 
-            # Insert into tmp report as craigslist id -> message sent
-            tmpReport.update({str(post['id']) : message.id})
+            # Insert into tmp report as craigslist url -> {message info}
+            tmpReport.update({post['url'].replace('.','*') : {'id': message.id, 'subject': message.subject}})
 
         # for testing
         models.connection['acw'].dupes.remove()
@@ -44,12 +45,12 @@ class AutoProcess(object):
         # print self.digest(self.posts)
 
         # Final report
-        reportDict = {'created_at': datetime.datetime.now()}
-        reportDict.update(tmpReport)
-
-        print reportDict
+        reportDict = {'created_at': datetime.datetime.now(), 'report': tmpReport}
+        #reportDict.update(tmpReport)
         report     = self.reports.insert(reportDict)
 
+        print reportDict
+        print report
 
     def scrape_posts(self, url):
         mailPattern   = re.compile(r'[\w\-][\w\-\.]*@[\w\-][\w\-\.]+[a-zA-Z]{1,4}', re.I)
@@ -70,13 +71,13 @@ class AutoProcess(object):
             print 'Scraping {}'.format(post)
             postUrl = 'http://{}{}'.format(baseUrl, post)
             html    = urllib2.urlopen(postUrl).read()
-            soup    = BeautifulSoup(html)
 
             postId  = re.findall(postIdPattern, html)[0]
             if not postId or postId in models.get_dupes(): continue
 
             models.add_to_dupes(postId)
 
+            soup      = BeautifulSoup(html)
             postTitle = soup.find('h2', class_='postingtitle').text
             postBody  = soup.find('section', id='postingbody').text
 

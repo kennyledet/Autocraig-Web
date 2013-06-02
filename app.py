@@ -18,6 +18,15 @@ def messages():
     messages = models.Message.query.all()
     return render_template('messages.html', messages=messages, messageCount=len(messages), datetime=datetime.datetime.now())
 
+@app.route('/reports')
+def reports():
+    messages = models.Message.query.all()
+
+    conn    = models.connection['acw'].reports
+    reports = list(conn.find())
+    print reports
+    return render_template('reports.html', reports=reports, messages=messages, messageCount=len(messages))
+
 @app.route('/_go')
 def go():
     selectedMessages = request.args.get('selectedMessages', 0, type=str)[0:-1].split(',')

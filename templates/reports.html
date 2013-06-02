@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="pure-u"><!-- col2 -->
+    <div class="content">
+        <!-- display messages -->
+        {% for report in reports %}
+            <div id="{{ report._id }}" class="email-item pure-u">
+                <div class="">
+                    <h5 class="email-name">Generated: {{ report.created_at.strftime('%a %Y-%m-%d at %H:%M') }}</h5>
+                </div>
+            </div>
+
+            {% for post, message in report['report'].iteritems() %}
+            <h4>Post: <a href="{{ post }}">{{ post.replace('*', '.') }}</a></h4>
+            <p>Sent message #{{ message['id'] }} {{ message['subject'] }}</p>
+            {% endfor %}
+
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
