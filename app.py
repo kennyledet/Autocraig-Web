@@ -80,7 +80,7 @@ def new_message():
             attachment.save(savePath)
 
     except Exception, e:
-        print e
+        print e        
     finally:
         return redirect(url_for('index'))
 

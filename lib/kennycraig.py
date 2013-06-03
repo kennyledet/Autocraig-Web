@@ -2,7 +2,7 @@
 # Modifications   : Kendrick Ledet
 
 
-import re, urllib2, datetime, random
+import re, urllib2, datetime, random, os
 import models
 from mailer import Mailer, Message
 from bs4    import BeautifulSoup
@@ -14,44 +14,41 @@ class AutoProcess(object):
         self.messages = messages
         self.reports  = models.connection['acw'].reports
 
+        self.uploadsBasePath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'uploads'))
 
     def start(self):
+        # Scrape posts
         posts     = list(chain.from_iterable([self.scrape_posts(url) for url in self.urls]))
         tmpReport = {}
 
-        print 'Using messages: '
-        print self.messages
-        print 'Found posts: '
-        print posts
+        print 'Using messages: ', self.messages
+        print 'Found posts: ', posts
 
         for post in posts:
             models.add_to_dupes(post['id'])
+
             message = random.choice(self.messages)  # choose random message to send to this ad
 
-            # Email ad poster
-            # self.send_email(message.fromAddress, post['toAddress'], message.subject, message.body, message.ccAddress)
+            if ', ' in message.fromAddress:  # choose random from address from , sep. list
+                message.fromAddress = random.choice(message.fromAddress.split(', '))
+
+            self.send_reply(message, post['toAddress'])  # email ad poster
+
             # Insert into tmp report as craigslist url -> {message info}
             if message.reportsEnabled:
-                print message.reportsEnabled
                 tmpReport.update({post['url'].replace('.','*') : {'id': message.id, 'subject': message.subject}})
 
         # for testing
         models.connection['acw'].dupes.remove()
 
         # Email digest to user
-        primaryFromAddress = self.messages[0].fromAddress
-        self.send_email(primaryFromAddress, primaryFromAddress, 'craigslist-auto-%s' % datetime.datetime.now(), self.digest(posts), CC=None, HTML=True)
-
-        # Print digest to stdout
-        # print self.digest(self.posts)
+        self.send_digest(self.messages[0].fromAddress, self.digest(posts))
 
         # Final report
         reportDict = {'created_at': datetime.datetime.now(), 'report': tmpReport}
-        #reportDict.update(tmpReport)
         report     = self.reports.insert(reportDict)
 
-        print reportDict
-        print report
+        print reportDict, report
 
     def scrape_posts(self, url):
         mailPattern   = re.compile(r'[\w\-][\w\-\.]*@[\w\-][\w\-\.]+[a-zA-Z]{1,4}', re.I)
@@ -66,15 +63,15 @@ class AutoProcess(object):
         postRows   = postsBlock.find_all('p', class_='row' )
         postLinks  = [row.contents[1]['href'] for row in postRows]
 
-        print postLinks
-
         for post in postLinks:
             print 'Scraping {}'.format(post)
             postUrl = 'http://{}{}'.format(baseUrl, post)
             html    = urllib2.urlopen(postUrl).read()
 
             postId  = re.findall(postIdPattern, html)[0]
-            if not postId or postId in models.get_dupes(): continue
+            print postId
+            if not postId or postId in models.get_dupes(): 
+                continue
 
             models.add_to_dupes(postId)
 
@@ -91,31 +88,26 @@ class AutoProcess(object):
 
         return posts
 
-
     def digest(self, posts):
         html = ''
-        for post in posts:
-            html += '<a href="{}">{}</a>\n'.format(post['url'], post['id'])
-
-        #print html
+        for post in posts: html += '<a href="{}">{}</a>\n'.format(post['url'], post['id'])
         return html
 
+    def send_reply(self, message, toAddress):
+        sender = Mailer(host='smtp.gmail.com', port=587, use_tls=True, usr='kendrickledet', pwd='yMHJ0e78gMbDtkV')
+        email  = Message(From=message.fromAddress, To=toAddress, Subject=message.subject, CC=message.ccAddress, charset="utf-8")
+        email.Html = message.body
 
-    def send_email(self, fromAddress, toAddress, subject, body, CC=None, HTML=False):
-        sender  = Mailer(host='smtp.gmail.com', port=587, use_tls=True, usr='kendrickledet', pwd='yMHJ0e78gMbDtkV')
-        message = Message(From=fromAddress, To=toAddress, Subject=subject, CC=CC, charset="utf-8")
+        messageUploads = '{}/{}/attachments/'.format(self.uploadsBasePath, message.id)
 
-        if HTML:
-            message.Html = body
-        else:
-            message.Body = body
+        for upload in os.listdir(messageUploads):
+            email.attach('{}{}'.format(messageUploads, upload))
+        
+        #sender.send(email)
 
-        #message.attach("kitty.jpg")
-        sender.send(message)
+    def send_digest(self, digestAddress, digest):
+        sender = Mailer(host='smtp.gmail.com', port=587, use_tls=True, usr='kendrickledet', pwd='yMHJ0e78gMbDtkV')
+        email  = Message(From=digestAddress, To=digestAddress, Subject='craigslist-auto-{}'.format(datetime.datetime.now()))
+        email.Html = digest
 
-    
-def main():
-    pass
-      
-if __name__ == '__main__':
-    main()
+        sender.send(email)

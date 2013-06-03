@@ -14,9 +14,6 @@ def start_task(selectedMessages, urls, sleepTime, sleepAmt):
         for messageId in map(int, selectedMessages):
             messages.append(models.Message.query.filter_by(id=messageId).first())
 
-        print 'Using messages: '
-        print messages
-
         process = AutoProcess(urls, messages)
         process.start()
 
