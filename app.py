@@ -57,26 +57,29 @@ def new_message():
     body           = request.form['body']
     reportsEnabled = request.form['reportsEnabled'] == 'on'
 
+    # Parse .txt file of from addresses if uploaded
+    fromAddrList   = request.files.get('fromAddressList')
+    if fromAddrList.stream.getvalue():
+        fromAddrList = fromAddrList.stream.getvalue().split('\n')
+        if '' in fromAddrList: fromAddrList.remove('')
+        fromAddress  = ', '.join(fromAddrList)
 
-    fromAddressList = request.files.get('fromAddressList')
-    if fromAddressList:
-        fromAddress = ', '.join(fromAddressList.stream.getvalue().split('\n')[0:-1])
-
-    basePath = os.path.dirname(os.path.realpath(__file__))
-    
     try: # Save message in db
         message = models.Message(fromAddress, ccAddress, subject, body, reportsEnabled)
         models.db.session.add(message)
         models.db.session.commit()
 
         # Save uploads
+        basePath = os.path.dirname(os.path.realpath(__file__))
         messageAttachmentsFolder = '{}/uploads/{}/attachments/'.format(basePath, message.id)
         make_dir(messageAttachmentsFolder)
-        for attachment in attachments:
+
+        for attachment in request.files.getlist('attachments'):
             savePath = '{}{}'.format(messageAttachmentsFolder, attachment.filename)
             attachment.save(savePath)
 
     except Exception, e:
+        print e
         result = 0
     else:
         result = 1
