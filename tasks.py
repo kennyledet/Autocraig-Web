@@ -8,15 +8,18 @@ celery     = Celery('tasks', broker=BROKER_URL)
 
 @celery.task
 def start_task(selectedMessages, urls, sleepTime, sleepAmt):
-    messages = []
-    for messageId in map(int, selectedMessages):
-        print messageId
-        messages.append(models.Message.query.filter_by(id=messageId).first())
+    iter = 0
+    while iter <= int(sleepAmt):
+        messages = []
+        for messageId in map(int, selectedMessages):
+            messages.append(models.Message.query.filter_by(id=messageId).first())
 
-    print 'Using messages: '
-    print messages
+        print 'Using messages: '
+        print messages
 
-    process = AutoProcess(urls, messages)
-    process.start()
+        process = AutoProcess(urls, messages)
+        process.start()
+
+        time.sleep(int(sleepTime))
 
 

@@ -1,5 +1,5 @@
 # Config
-from  flask import Flask, render_template, request, jsonify, Response, url_for
+from  flask import Flask, render_template, redirect, request, jsonify, Response, url_for
 app = Flask(__name__)
 
 import os, datetime, time
@@ -57,7 +57,7 @@ def new_message():
     body           = request.form['body']
     reportsEnabled = request.form['reportsEnabled'] == 'on'
 
-    # Parse .txt file of from addresses, if uploaded
+    # Parse .txt file of from addresses if uploaded
     fromAddrList   = request.files.get('fromAddressList')
     if fromAddrList.stream.getvalue():
         fromAddrList = fromAddrList.stream.getvalue().split('\n')
@@ -76,6 +76,7 @@ def new_message():
 
         for attachment in request.files.getlist('attachments'):
             savePath = '{}{}'.format(messageAttachmentsFolder, attachment.filename)
+            print savePath
             attachment.save(savePath)
 
     except Exception, e:
