@@ -27,22 +27,22 @@
         </div>
 	</div>
     <div class="email-content-body pure-u-1">
-        <form class="pure-form" method="POST" enctype="multipart/form-data" action="/_upload">
+        <form class="pure-form" method="POST" enctype="multipart/form-data" action="/_new_message">
             <fieldset>
                 <p>
                     <label>From</label>
-                    <input id="fromAddress" class="input-xlarge" type="text" placeholder="you@mail.com">
+                    <input name="fromAddress" class="input-xlarge" type="text" placeholder="you@mail.com">
                     or
                     <input name="fromAddressList" type="file"/>
                 </p>
                 <p>
                     <label>CC</label>
-                    <input id="ccAddress" class="input-xlarge" type="text" placeholder="cc@mail.com">
+                    <input name="ccAddress" class="input-xlarge" type="text" placeholder="cc@mail.com">
                 </p>
-                <p><label>Send me reports<input id="reportsEnabled" type="checkbox"></label></p>
+                <p><label>Send me reports<input name="reportsEnabled" type="checkbox"></label></p>
                 <p>
                     <label>Subject</label>
-                    <input id="subject" class="input-xlarge" type="text" placeholder="Subject">
+                    <input name="subject" class="input-xlarge" type="text" placeholder="Subject">
                 </p>
                 <p>
                     <label>Attachments</label>
@@ -52,7 +52,7 @@
                 <div></div>
 
                 <label>Message Content</label>
-                <textarea id="content" class="input-xxlarge expanding" type="text"></textarea>
+                <textarea name="body" class="input-xxlarge expanding" type="text"></textarea>
                 <div style="margin-top:50px;"></div>
 
                 <button id="addMessage" type="submit" class="pure-button pure-button-primary">Add</button>

@@ -68,6 +68,7 @@ def new_message():
         message = models.Message(fromAddress, ccAddress, subject, body, reportsEnabled)
         models.db.session.add(message)
         models.db.session.commit()
+        print message.fromAddress
 
         # Save uploads
         messageAttachmentsFolder = '{}/uploads/{}/attachments/'.format(basePath, message.id)
@@ -77,6 +78,7 @@ def new_message():
             attachment.save(savePath)
 
     except Exception, e:
+        print e
         result = 0
     else:
         result = 1

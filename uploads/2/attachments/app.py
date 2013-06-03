@@ -3,7 +3,6 @@ from  flask import Flask, render_template, request, jsonify, Response, url_for
 app = Flask(__name__)
 
 import os, datetime, time
-import StringIO
 import models
 import tasks
 
@@ -57,10 +56,9 @@ def new_message():
     body           = request.form['body']
     reportsEnabled = request.form['reportsEnabled'] == 'on'
 
-
+    attachments     = request.files.getlist('attachments')
     fromAddressList = request.files.get('fromAddressList')
-    if fromAddressList:
-        fromAddress = ', '.join(fromAddressList.stream.getvalue().split('\n')[0:-1])
+    print dir(fromAddressList)
 
     basePath = os.path.dirname(os.path.realpath(__file__))
     
@@ -77,6 +75,7 @@ def new_message():
             attachment.save(savePath)
 
     except Exception, e:
+        print e
         result = 0
     else:
         result = 1
