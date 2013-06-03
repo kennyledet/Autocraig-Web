@@ -22,4 +22,6 @@ def start_task(selectedMessages, urls, sleepTime, sleepAmt):
 
         time.sleep(int(sleepTime))
 
+        iter += 1
+
 
