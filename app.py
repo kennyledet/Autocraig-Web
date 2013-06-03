@@ -57,7 +57,7 @@ def new_message():
     body           = request.form['body']
     reportsEnabled = request.form['reportsEnabled'] == 'on'
 
-    # Parse .txt file of from addresses if uploaded
+    # Parse .txt file of from addresses, if uploaded
     fromAddrList   = request.files.get('fromAddressList')
     if fromAddrList.stream.getvalue():
         fromAddrList = fromAddrList.stream.getvalue().split('\n')
@@ -80,11 +80,8 @@ def new_message():
 
     except Exception, e:
         print e
-        result = 0
-    else:
-        result = 1
     finally:
-        return jsonify(result=result)
+        return redirect(url_for('index'))
 
 
 
