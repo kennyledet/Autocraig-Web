@@ -51,8 +51,12 @@ def new_message():
     body           = request.args.get('body',        0, type=str)
     reportsEnabled = request.args.get('reportsEnabled', 0, type=str) == 'on'
 
+    attachments     = request.files.getlist('attachments')
+    fromAddressList = request.files.get('fromAddressList')
+    
     try:
         message = models.Message(fromAddress, ccAddress, subject, body, reportsEnabled)
+        print message
         models.db.session.add(message)
         models.db.session.commit()
     except Exception, e:
@@ -62,27 +66,7 @@ def new_message():
     finally:
         return jsonify(result=result)
 
-"""
-@app.route('/_upload', methods=['GET', 'POST'])
-def upload():
-    if request.method == 'GET':
-        # return a list of dicts with info about already available files:
-        filesInfo = []
-        for fileName in os.listdir('uploads'):
-            fileURL  = url_for('uploads', filename=fileName)
-            fileSize = os.path.getsize('uploads/{}'.format(fileName))
-            fileInfo.append({name: fileName, size: fileSize, url: fileURL})
-        return jsonify(files=filesInfo)
-    else:
-        data     = request.files.get('data_file')
-        fileName = data.filename
 
-        save_file(data, fileName)
-
-        fileSize = os.path.getsize('uploads/{}'.format(fileName))
-        fileURL  = url_for('uploads', filename=fileName)
-        return jsonify(name=fileName, size=fileSize, url=fileURL)
-"""
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.

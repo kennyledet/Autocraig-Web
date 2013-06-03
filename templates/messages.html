@@ -27,18 +27,27 @@
         </div>
 	</div>
     <div class="email-content-body pure-u-1">
-        <form class="pure-form">
+        <form class="pure-form" method="POST" enctype="multipart/form-data" action="/_upload">
             <fieldset>
+                <p>
                     <label>From</label>
                     <input id="fromAddress" class="input-xlarge" type="text" placeholder="you@mail.com">
-
+                    or
+                    <input name="fromAddressList" type="file"/>
+                </p>
+                <p>
                     <label>CC</label>
                     <input id="ccAddress" class="input-xlarge" type="text" placeholder="cc@mail.com">
-
-                    <p><label>Send me reports<input id="reportsEnabled" type="checkbox"> </label></p>
-
+                </p>
+                <p><label>Send me reports<input id="reportsEnabled" type="checkbox"></label></p>
+                <p>
                     <label>Subject</label>
                     <input id="subject" class="input-xlarge" type="text" placeholder="Subject">
+                </p>
+                <p>
+                    <label>Attachments</label>
+                    <input name="attachments" type="file" multiple="multiple"/>
+                </p>
 
                 <div></div>
 
@@ -60,6 +69,8 @@
 {% block js %}
 <script type="text/javascript">
 $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+/*
 $('#addMessage').click(function(event) {
 	event.preventDefault();
     if ($('#email-list').children().length) {
@@ -70,8 +81,8 @@ $('#addMessage').click(function(event) {
 
     newMessageId = latestMessageId + 1;
 
-    var subject = $('#subject').val();
-    var body    = $('#content').val();
+    //var subject = $('#subject').val();
+    //var body    = $('#content').val();
 	// post ajax request to add message to db
 	$.getJSON($SCRIPT_ROOT + '/_new_message', {
 		fromAddress: $('#fromAddress').val(),
@@ -81,14 +92,14 @@ $('#addMessage').click(function(event) {
 		ccAddress: 	 $('#ccAddress').val(),
 	   }, function(data) {
 
-    var msgStr = ('<div id="'+newMessageId+'" class=email-item pure-g"><div class="pure-u-3-4"><h3 class="email-name">Created: Just now..</h3><h4 class="email-subject">'+subject+'</h4><p class="email-desc">'+body+'</p></div></div>');
+        var msgStr = ('<div id="'+newMessageId+'" class=email-item pure-g"><div class="pure-u-3-4"><h3 class="email-name">Created: Just now..</h3><h4 class="email-subject">'+subject+'</h4><p class="email-desc">'+body+'</p></div></div>');
 
-    $('#email-list').prepend(msgStr);
+        $('#email-list').prepend(msgStr);
 
-    // update email count
-    $('#email-count').text(Number($('#email-count').text()) + 1);
+        // update email count
+        $('#email-count').text(Number($('#email-count').text()) + 1);
 
-    });
+    });*/
 
 
 	return false;

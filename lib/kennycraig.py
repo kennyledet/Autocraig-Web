@@ -30,7 +30,8 @@ class AutoProcess(object):
 
             # Email ad poster
             # self.send_email(message.fromAddress, post['toAddress'], message.subject, message.body, message.ccAddress)
-
+            #
+            # TODO: Need to make a patch fix here: only do insert into reports if message.reportsEnabled
             # Insert into tmp report as craigslist url -> {message info}
             tmpReport.update({post['url'].replace('.','*') : {'id': message.id, 'subject': message.subject}})
 
