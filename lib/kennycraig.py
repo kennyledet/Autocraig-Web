@@ -69,7 +69,7 @@ class AutoProcess(object):
             html    = urllib2.urlopen(postUrl).read()
 
             postId  = re.findall(postIdPattern, html)[0]
-            print postId
+            print 'Found {}'.format(postId)
             if not postId or postId in models.get_dupes(): 
                 continue
 

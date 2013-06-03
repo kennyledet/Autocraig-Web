@@ -76,7 +76,6 @@ def new_message():
 
         for attachment in request.files.getlist('attachments'):
             savePath = '{}{}'.format(messageAttachmentsFolder, attachment.filename)
-            print savePath
             attachment.save(savePath)
 
     except Exception, e:
