@@ -39,7 +39,7 @@ class AutoProcess(object):
                 tmpReport.update({post['url'].replace('.','*') : {'id': message.id, 'subject': message.subject}})
 
         # for testing
-        models.connection['acw'].dupes.remove()
+        ##models.connection['acw'].dupes.remove()
 
         # Email digest to user
         self.send_digest(self.messages[0].fromAddress, self.digest(posts))
@@ -94,19 +94,21 @@ class AutoProcess(object):
         return html
 
     def send_reply(self, message, toAddress):
-        sender = Mailer(host='smtp.gmail.com', port=587, use_tls=True, usr='kendrickledet', pwd='yMHJ0e78gMbDtkV')
-        email  = Message(From=message.fromAddress, To=toAddress, Subject=message.subject, CC=message.ccAddress, charset="utf-8")
+        sender = Mailer(host='mail.banglamafia.com', port=25, usr='bangla', pwd='Sn"IaaCi')
+        email  = Message(From=message.fromAddress, To=toAddress, Subject=message.subject, CC=message.ccAddress)
         email.Html = message.body
 
         messageUploads = '{}/{}/attachments/'.format(self.uploadsBasePath, message.id)
 
         for upload in os.listdir(messageUploads):
             email.attach('{}{}'.format(messageUploads, upload))
+
+        print 'sending', message.subject, ' to', toAddress
         
-        #sender.send(email)
+        sender.send(email)
 
     def send_digest(self, digestAddress, digest):
-        sender = Mailer(host='smtp.gmail.com', port=587, use_tls=True, usr='kendrickledet', pwd='yMHJ0e78gMbDtkV')
+        sender = Mailer(host='mail.banglamafia.com', port=25, usr='bangla', pwd='Sn"IaaCi')
         email  = Message(From=digestAddress, To=digestAddress, Subject='craigslist-auto-{}'.format(datetime.datetime.now()))
         email.Html = digest
 

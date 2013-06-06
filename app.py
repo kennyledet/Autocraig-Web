@@ -69,7 +69,7 @@ def new_message():
         models.db.session.add(message)
         models.db.session.commit()
 
-        # Save uploads
+        # Save uploads in message attachments folder
         basePath = os.path.dirname(os.path.realpath(__file__))
         messageAttachmentsFolder = '{}/uploads/{}/attachments/'.format(basePath, message.id)
         make_dir(messageAttachmentsFolder)

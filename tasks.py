@@ -3,7 +3,7 @@ import models
 from celery import Celery
 from lib.kennycraig import AutoProcess
 
-BROKER_URL = 'redis://localhost:6379/0'
+BROKER_URL = 'sqla+sqlite:///celerydb.sqlite'
 celery     = Celery('tasks', broker=BROKER_URL)
 
 @celery.task
@@ -20,5 +20,3 @@ def start_task(selectedMessages, urls, sleepTime, sleepAmt):
         time.sleep(int(sleepTime))
 
         iter += 1
-
-
