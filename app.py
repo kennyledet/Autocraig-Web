@@ -13,6 +13,7 @@ def make_dir(dirname):
         return os.makedirs(dirname, mode=0777)
     else:
         return None
+
 # Routes
 @app.route('/')
 def index():
@@ -33,6 +34,14 @@ def reports():
     print reports
     return render_template('reports.html', reports=reports, messages=messages, messageCount=len(messages))
 
+@app.route('/update_task/<task_id>')
+def update_task(task_id):
+    pass
+
+@app.route('/read_task/<task_id>')
+def change_tasks(task_id):
+    pass
+
 @app.route('/_go')
 def go():
     selectedMessages = request.args.get('selectedMessages', 0, type=str)[0:-1].split(',')
@@ -43,11 +52,14 @@ def go():
 
     if not selectedMessages:
         result = 0
+        taskID = None
     else:
-        tasks.start_task.delay(selectedMessages, urls, sleepTime, sleepAmt)
         result = 1
+        # record taskID as timestamp and pass into task so it can be self aware
+        taskID = time.time()
+        tasks.start_task.delay(selectedMessages, urls, sleepTime, sleepAmt, taskID)
 
-    return jsonify(result=result)
+    return jsonify(result=result, taskID=taskID)
 
 @app.route('/_new_message', methods=['POST', 'GET'])
 def new_message():
