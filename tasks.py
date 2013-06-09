@@ -20,3 +20,14 @@ def start_task(selectedMessages, urls, sleepTime, sleepAmt):
         time.sleep(int(sleepTime))
 
         iter += 1
+
+"""
+TODO:
+this task should poll an endpoint in the Flask webservice I set up
+endpoint should tell us whether or not to *pause* the running task by calling time.sleep(1) (while isNecessary)?
+isNecessary should be determined by frontend manipulating this endpoint through UI/UX
+in order for this to work, we need task ids for the frontend to know what it's
+working with 
+
+OR another option could be to have the task set itself up to have itself run again,
+and in theory the duplicates prevention would still be effective. We could also pass in report ids to update existing reports
