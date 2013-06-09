@@ -11,7 +11,7 @@ def start_task(selectedMessages, urls, sleepTime, sleepAmt, taskID):
     # Register taskID in MongoDB collection and mark as running
     conn  = models.connection['acw'].tasks  
     tasks = list(conn.find())
-    conn.insert({'taskID': taskID, 'running', True})
+    conn.insert({'taskID': taskID, 'running': True})
 
     iter = 0
     while iter <= int(sleepAmt):
