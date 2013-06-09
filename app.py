@@ -56,7 +56,7 @@ def go():
     else:
         result = 1
         # record taskID as timestamp and pass into task so it can be self aware
-        taskID = time.time()
+        taskID = str(time.time())
         tasks.start_task.delay(selectedMessages, urls, sleepTime, sleepAmt, taskID)
 
     return jsonify(result=result, taskID=taskID)

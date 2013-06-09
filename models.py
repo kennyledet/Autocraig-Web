@@ -13,6 +13,8 @@ MONGODB_PORT = 27017
 
 connection = Connection()
 
+tasksDB = connection.acw.tasks
+
 # Models
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -9,12 +9,11 @@ celery     = Celery('tasks', broker=BROKER_URL)
 @celery.task
 def start_task(selectedMessages, urls, sleepTime, sleepAmt, taskID):
     # Register taskID in MongoDB collection and mark as running
-    conn  = models.connection['acw'].tasks  
-    tasks = list(conn.find())
-    conn.insert({'taskID': taskID, 'running': True})
+    db      = models.tasksDB
+    taskDoc = str(db.insert({'taskID': taskID, 'running': True}))
 
     iter = 0
-    while iter <= int(sleepAmt):
+    while (iter <= int(sleepAmt)) and  db.one({'taskID': taskID})['running']: 
         messages = []
         for messageId in map(int, selectedMessages):
             messages.append(models.Message.query.filter_by(id=messageId).first())
