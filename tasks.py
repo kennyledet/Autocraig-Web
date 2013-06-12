@@ -2,6 +2,7 @@ import os, time
 import models
 from celery import Celery
 from lib.kennycraig import AutoProcess
+from bson.objectid  import ObjectId
 
 BROKER_URL = 'sqla+sqlite:///celerydb.sqlite'
 celery     = Celery('tasks', broker=BROKER_URL)
@@ -17,7 +18,8 @@ def start_task(selectedMessages, urls, sleepTime, sleepAmt, taskID):
         state = db.find_one({'taskID': taskID})['state']
         if state == 1:  # run
             if iteration <= sleepAmt:
-                messages = [models.Message.query.filter_by(id=messageId) for messageId in map(int, selectedMessages)]
+                messages = [models.connection.acw.messages.find_one({u'_id': ObjectId(message_id)}) 
+                            for message_id in selectedMessages]
                 process  = AutoProcess(urls, messages)
                 process.start()
                 time.sleep(sleepTime)

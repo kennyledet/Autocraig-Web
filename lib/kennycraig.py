@@ -14,6 +14,7 @@ class AutoProcess(object):
         self.messages = messages
         self.reports  = models.connection.acw.reports
         self.tasks    = models.connection.acw.tasks
+        self.dupes    = models.connection.acw.dupes
 
         self.uploadsBasePath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'uploads'))
 
@@ -22,36 +23,44 @@ class AutoProcess(object):
         posts     = list(chain.from_iterable([self.scrape_posts(url) for url in self.urls]))
         tmpReport = {}
 
-        print 'Using messages: '.format(self.messages)
+        print 'Using messages: {}'.format(self.messages)
         print 'Found posts: {}'.format(posts)
 
         for post in posts:
             # Check current task state
             state = self.tasks.find_one({'taskID': taskID})['state']
-            if state == 0:
+            if state == 0:  # quit
                 break
-            elif state == -1:
-                while db.find_one({'taskID': taskID})['state'] == -1:
+            elif state == -1:  # pause
+                while self.tasks.find_one({'taskID': taskID})['state'] == -1:
                     pass
 
-            models.add_to_dupes(post['id'])
+            # Duplication prevention
+            if post['id'] in [dupe['id'] for dupe in list(self.dupes.find())]:
+                continue
+            else:
+                self.dupes.insert({'id': post['id']})
 
-            message = random.choice(self.messages)  # choose random message to send to this ad
+            message = random.choice(self.messages)
 
-            if ', ' in message.fromAddress:  # choose random from address from , sep. list
-                message.fromAddress = random.choice(message.fromAddress.split(', '))
+            if ', ' in message['fromAddress']:  # choose random from address from comma sep. list
+                message['fromAddress'] = random.choice(message['fromAddress'].split(', '))
 
-            self.send_reply(message, post['toAddress'])  # email ad poster
+            #self.send_reply(message, post['toAddress'])
 
-            # Insert into tmp report as craigslist url -> {message info}
-            if message.reportsEnabled:
-                tmpReport.update({post['url'].replace('.','*') : {'id': message.id, 'subject': message.subject}})
+            if message['reportsEnabled']:
+                # Add to task report
+                tmpReport.update({post['url'].replace('.','*') : {'id': message['_id'], 'subject': message['subject'],
+                    'body': message['body']}})
+
+                # Report to report email
+
 
         # for testing
-        ##models.connection['acw'].dupes.remove()
+        ##self.dupes.remove()
 
         # Email digest to user
-        self.send_digest(self.messages[0].fromAddress, self.digest(posts))
+        #self.send_digest(self.messages[0]['from'], self.digest(posts))
 
         # Final report
         reportDict = {'created_at': datetime.datetime.now(), 'report': tmpReport}
@@ -104,15 +113,15 @@ class AutoProcess(object):
 
     def send_reply(self, message, toAddress):
         sender = Mailer(host='mail.banglamafia.com', port=25, usr='bangla', pwd='Sn"IaaCi')
-        email  = Message(From=message.fromAddress, To=toAddress, Subject=message.subject, CC=message.ccAddress)
+        email  = Message(From=message['fromAddress'], To=toAddress, Subject=message['subject'], CC=message['ccAddress'])
         email.Html = message.body
 
-        messageUploads = '{}/{}/attachments/'.format(self.uploadsBasePath, message.id)
+        messageUploads = '{}/{}/attachments/'.format(self.uploadsBasePath, message['_id'])
 
         for upload in os.listdir(messageUploads):
             email.attach('{}{}'.format(messageUploads, upload))
 
-        print 'sending', message.subject, ' to', toAddress
+        print 'sending', message['subject'], ' to', toAddress
         
         sender.send(email)
 

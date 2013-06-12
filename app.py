@@ -81,7 +81,7 @@ def new_message():
 
         # Save uploads in message attachments folder
         basePath = os.path.dirname(os.path.realpath(__file__))
-        messageAttachmentsFolder = '{}/uploads/{}/attachments/'.format(basePath, message.id)
+        messageAttachmentsFolder = '{}/uploads/{}/attachments/'.format(basePath, message['_id'])
         make_dir(messageAttachmentsFolder)
 
         for attachment in request.files.getlist('attachments'):
