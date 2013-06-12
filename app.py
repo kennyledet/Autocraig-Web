@@ -29,18 +29,21 @@ def messages():
 def reports():
     messages = models.Message.query.all()
 
-    conn    = models.connection['acw'].reports
+    conn    = models.connection.acw.reports
     reports = list(conn.find())
     print reports
     return render_template('reports.html', reports=reports, messages=messages, messageCount=len(messages))
 
 @app.route('/_update_task')
 def update_task():
+    ''' Set running Celery task to a new state '''
     taskID = request.args.get('taskID', 0, type=str)
     state  = request.args.get('state', 0, type=int)
 
-    db = models.connection['acw'].tasks
+    db = models.connection.acw.tasks
     db.update({'taskID': taskID}, {'$set': {'state': state}})
+
+    return jsonify(result=1)
 
 @app.route('/_start')
 def go():

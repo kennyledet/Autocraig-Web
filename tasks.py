@@ -11,7 +11,7 @@ def start_task(selectedMessages, urls, sleepTime, sleepAmt, taskID):
     # Register task and mark as running
     db   = models.connection.acw.tasks
     task = db.insert({'taskID': taskID, 'state': 1})
-    iter = 0
+    iteration = 0
     while True:
         # check state
         state = db.find_one({'taskID': taskID})['state']

@@ -11,7 +11,7 @@
             </div>
 
             {% for post, message in report['report'].iteritems() %}
-            <h4>Post: <a href="{{ post }}">{{ post.replace('*', '.') }}</a></h4>
+            <h4>Post: <a href="{{ post.replace('*', '.') }}">{{ post.replace('*', '.') }}</a></h4>
             <p>Sent message #{{ message['id'] }} {{ message['subject'] }}</p>
             {% endfor %}
 
