@@ -12,7 +12,8 @@ class AutoProcess(object):
     def __init__(self, urls, messages):
         self.urls     = urls
         self.messages = messages
-        self.reports  = models.connection['acw'].reports
+        self.reports  = models.connection.acw.reports
+        self.tasks    = models.connection.acw.tasks
 
         self.uploadsBasePath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'uploads'))
 
@@ -21,10 +22,18 @@ class AutoProcess(object):
         posts     = list(chain.from_iterable([self.scrape_posts(url) for url in self.urls]))
         tmpReport = {}
 
-        print 'Using messages: ', self.messages
-        print 'Found posts: ', posts
+        print 'Using messages: '.format(self.messages)
+        print 'Found posts: {}'.format(posts)
 
         for post in posts:
+            # Check current task state
+            state = self.tasks.find_one({'taskID': taskID})['state']
+            if state == 0:
+                break
+            elif state == -1:
+                while db.find_one({'taskID': taskID})['state'] == -1:
+                    pass
+
             models.add_to_dupes(post['id'])
 
             message = random.choice(self.messages)  # choose random message to send to this ad

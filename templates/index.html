@@ -43,7 +43,11 @@
 			</div>
 		    <div style="margin-top:15px;"></div>
 
-			<button id="go" type="submit" class="pure-button pure-button-primary">Go</button>
+			<button id="start" type="submit" class="pure-button pure-button-primary">Start</button>
+            <button id="continue" class="pure-button pure-button-disabled">Pause</button>
+            <button id="pause" class="pure-button pure-button-disabled">Pause</button>
+            <button id="stop"  class="pure-button pure-button-disabled">Stop</button>
+            <input type="hidden" id="taskID" name="taskID" value="">
 
 	    </fieldset>
     </form>
@@ -66,7 +70,7 @@ $('.email-item').click(function(event) {
 		 $(this).addClass('email-item-selected');
 });
 
-$('#go').click(function(event) {
+$('#start').click(function(event) {
 	event.preventDefault();
 	if ( $('#urls').val().split('\n')[0] != null ) {  // post ajax request to start sending messages
 		var selectedMessages = '';
@@ -75,18 +79,76 @@ $('#go').click(function(event) {
 			selectedMessages += $(this).prop('id') + ',';
 		});
 
-		$.getJSON($SCRIPT_ROOT + '/_go', {
+		$.getJSON($SCRIPT_ROOT + '/_start', {
 			selectedMessages: selectedMessages,
 			urls:      $('#urls').val(),
 			sleepTime: $('#sleep-time').val(),
 			sleepAmt:  $('#sleep-amt').val()
 		}, function(data) {
-			//alert(data.result); // 1 or 0
+		      if (data.result) {
+                  $('#taskID').val(data.taskID);
+
+                  $('#start').addClass('pure-button-disabled');
+                  $('#pause').prop('class', 'pure-button');
+                  $('#stop').prop('class', 'pure-button');
+              };
 		});
 		
 	};
 	return false;
 });
+
+$('#pause').click(function(event) {
+    event.preventDefault();
+    taskID = $('#taskID').val();
+    if (taskID) {
+        $.getJSON($SCRIPT_ROOT + '/_update_task', {
+            taskID: taskID,
+            state: -1
+        }, function(data) {
+               if (data.result) {
+                $('#pause').addClass('pure-button-disabled');
+                $('#continue').prop('class', 'pure-button');
+                $('#stop').prop('class', 'pure-button');
+               };
+        });
+
+    }
+})
+$('#continue').click(function(event) {
+    event.preventDefault();
+    taskID = $('#taskID').val();
+    if (taskID) {
+        $.getJSON($SCRIPT_ROOT + '/_update_task', {
+            taskID: taskID,
+            state: 1
+        }, function(data) {
+               if (data.result) {
+                $('#continue').addClass('pure-button-disabled');
+                $('#pause').prop('class', 'pure-button');
+                $('#stop').prop('class', 'pure-button');
+               };
+        });
+
+    }
+})
+$('#stop').click(function(event) {
+    event.preventDefault();
+    taskID = $('#taskID').val();
+    if (taskID) {
+        $.getJSON($SCRIPT_ROOT + '/_update_task', {
+            taskID: taskID,
+            state: 0
+        }, function(data) {
+               if (data.result) {
+                $('#stop').addClass('pure-button-disabled');
+                $('#start').prop('class', 'pure-button');
+                $('#pause').prop('class', 'pure-button');
+               };
+        });
+
+    }
+})
 </script>
 {% endblock %}
 </body>

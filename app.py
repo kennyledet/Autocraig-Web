@@ -34,29 +34,27 @@ def reports():
     print reports
     return render_template('reports.html', reports=reports, messages=messages, messageCount=len(messages))
 
-@app.route('/update_task/<task_id>')
-def update_task(task_id):
-    pass
+@app.route('/_update_task')
+def update_task():
+    taskID = request.args.get('taskID', 0, type=str)
+    state  = request.args.get('state', 0, type=int)
 
-@app.route('/read_task/<task_id>')
-def change_tasks(task_id):
-    pass
+    db = models.connection['acw'].tasks
+    db.update({'taskID': taskID}, {'$set': {'state': state}})
 
-@app.route('/_go')
+@app.route('/_start')
 def go():
     selectedMessages = request.args.get('selectedMessages', 0, type=str)[0:-1].split(',')
     urls             = request.args.get('urls',             0, type=str).split('\n')
-
     sleepTime        = request.args.get('sleepTime',        0, type=int)
     sleepAmt         = request.args.get('sleepAmt',         0, type=int)
 
-    if not selectedMessages:
+    if not selectedMessages or not urls:
         result = 0
         taskID = None
     else:
         result = 1
-        # record taskID as timestamp and pass into task so it can be self aware
-        taskID = str(time.time())
+        taskID = str(time.time())  # record taskID as timestamp
         tasks.start_task.delay(selectedMessages, urls, sleepTime, sleepAmt, taskID)
 
     return jsonify(result=result, taskID=taskID)

@@ -8,28 +8,24 @@ celery     = Celery('tasks', broker=BROKER_URL)
 
 @celery.task
 def start_task(selectedMessages, urls, sleepTime, sleepAmt, taskID):
-    # Register taskID in MongoDB collection and mark as running
-    db      = models.tasksDB
-    taskDoc = str(db.insert({'taskID': taskID, 'running': True}))
-
+    # Register task and mark as running
+    db   = models.connection.acw.tasks
+    task = db.insert({'taskID': taskID, 'state': 1})
     iter = 0
-    while (iter <= int(sleepAmt)) and  db.one({'taskID': taskID})['running']: 
-        messages = []
-        for messageId in map(int, selectedMessages):
-            messages.append(models.Message.query.filter_by(id=messageId).first())
-
-        process = AutoProcess(urls, messages)
-        process.start()
-
-        time.sleep(int(sleepTime))
-
-        iter += 1
-
-"""
-TODO:
-start_task should poll the MongoDB collection directly
-this polling should tell us whether or not to *pause* the running task by calling time.sleep(1) (while isNecessary)?
-isNecessary should be determined by frontend manipulating this endpoint through UI/UX
-
-The frontend needs a way to update the collection via endpoint
-"""
+    while True:
+        # check state
+        state = db.find_one({'taskID': taskID})['state']
+        if state == 1:  # run
+            if iteration <= sleepAmt:
+                messages = [models.Message.query.filter_by(id=messageId) for messageId in map(int, selectedMessages)]
+                process  = AutoProcess(urls, messages)
+                process.start()
+                time.sleep(sleepTime)
+                iteration += 1
+            else:
+                db.update({'taskID': taskID}, {'$set': {'state': 0}})
+        elif state == 0:  # quit
+            return
+        elif state == -1:  # pause
+            while db.find_one({'taskID': taskID})['state'] == -1:
+                pass
