@@ -17,21 +17,18 @@ def make_dir(dirname):
 # Routes
 @app.route('/')
 def index():
-    messages = models.Message.query.all()
+    messages = list(models.connection.acw.messages.find({}))
     return render_template('index.html', messages=messages, messageCount=len(messages), datetime=datetime.datetime.now())
 
 @app.route('/messages')
 def messages():
-    messages = models.Message.query.all()
+    messages = list(models.connection.acw.messages.find({}))
     return render_template('messages.html', messages=messages, messageCount=len(messages), datetime=datetime.datetime.now())
 
 @app.route('/reports')
 def reports():
-    messages = models.Message.query.all()
-
-    conn    = models.connection.acw.reports
-    reports = list(conn.find())
-    print reports
+    messages = list(models.connection.acw.messages.find({}))
+    reports  = list(models.connection.acw.reports.find({}))
     return render_template('reports.html', reports=reports, messages=messages, messageCount=len(messages))
 
 @app.route('/_update_task')
@@ -40,13 +37,13 @@ def update_task():
     taskID = request.args.get('taskID', 0, type=str)
     state  = request.args.get('state', 0, type=int)
 
-    db = models.connection.acw.tasks
-    db.update({'taskID': taskID}, {'$set': {'state': state}})
+    models.connection.acw.tasks.update({'taskID': taskID}, {'$set': {'state': state}})
 
     return jsonify(result=1)
 
 @app.route('/_start')
-def go():
+def start():
+    ''' Start new task '''
     selectedMessages = request.args.get('selectedMessages', 0, type=str)[0:-1].split(',')
     urls             = request.args.get('urls',             0, type=str).split('\n')
     sleepTime        = request.args.get('sleepTime',        0, type=int)
@@ -69,6 +66,7 @@ def new_message():
     subject        = request.form['subject']
     body           = request.form['body']
     reportsEnabled = request.form['reportsEnabled'] == 'on'
+    reportAddress  = request.form['reportAddress']
 
     # Parse .txt file of from addresses if uploaded
     fromAddrList   = request.files.get('fromAddressList')
@@ -78,9 +76,8 @@ def new_message():
         fromAddress  = ', '.join(fromAddrList)
 
     try: # Save message in db
-        message = models.Message(fromAddress, ccAddress, subject, body, reportsEnabled)
-        models.db.session.add(message)
-        models.db.session.commit()
+        models.connection.acw.messages.insert({'created_at': datetime.datetime.now(), 'fromAddress': fromAddress, 'ccAddress': ccAddress,
+            'subject': subject, 'body': body, 'reportsEnabled': reportsEnabled, 'reportAddress': reportAddress })
 
         # Save uploads in message attachments folder
         basePath = os.path.dirname(os.path.realpath(__file__))
@@ -94,7 +91,7 @@ def new_message():
     except Exception, e:
         print e        
     finally:
-        return redirect(url_for('index'))
+        return redirect(url_for('messages'))
 
 
 

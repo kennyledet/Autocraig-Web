@@ -9,6 +9,8 @@
                 <h5 class="email-name">Created: {{ message.created_at.strftime('%a %Y-%m-%d at %H:%M') }}</h5>
                 <h4 class="email-subject">{{ message.subject }}</h4>
                 <p class="email-desc">{{ message.body }}</p>
+
+                <button class="pure-button">Edit</button>
             </div>
         </div>
         {% endfor %}
@@ -39,7 +41,9 @@
                     <label>CC</label>
                     <input name="ccAddress" class="input-xlarge" type="text" placeholder="cc@mail.com">
                 </p>
-                <p><label>Enable reporting <input name="reportsEnabled" type="checkbox"></label></p>
+                <p><label>Enable reporting <input name="reportsEnabled" type="checkbox"></label>
+                    <input id="reportAddress" name="reportAddress" type="hidden" value="" placeholder="report@mail.com">
+                </p>
                 <p>
                     <label>Subject</label>
                     <input name="subject" class="input-xlarge" type="text" placeholder="Subject">
@@ -63,6 +67,16 @@
 </div>
 </div>
 
+{% endblock %}
+{% block js %}
+<script type="text/javascript">
+    $('input[name="reportsEnabled"]').click(function(event) {
+        if ($('#reportAddress').prop('type') == 'hidden')
+            $('#reportAddress').prop('type', 'text');
+        else
+            $('#reportAddress').prop('type', 'hidden')
+    });
+</script>
 {% endblock %}
 
 </body>

@@ -1,5 +1,4 @@
 import datetime
-import itertools
 from flask.ext.sqlalchemy import SQLAlchemy
 from mongokit import Connection, Document
 from app      import app
