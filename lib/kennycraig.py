@@ -46,21 +46,16 @@ class AutoProcess(object):
             if ', ' in message['fromAddress']:  # choose random from address from comma sep. list
                 message['fromAddress'] = random.choice(message['fromAddress'].split(', '))
 
-            #self.send_reply(message, post['toAddress'])
+            self.send_reply(message, post['toAddress'])
 
             if message['reportsEnabled']:
-                # Add to task report
-                tmpReport.update({post['url'].replace('.','*') : {'id': message['_id'], 'subject': message['subject'],
-                    'body': message['body']}})
+                self.send_report(message)
 
-                # Report to report email
+            # Add to task report
+            tmpReport.update({post['url'].replace('.','*') : {'id': message['_id'], 'subject': message['subject'],
+                'body': message['body']}})
 
-
-        # for testing
         ##self.dupes.remove()
-
-        # Email digest to user
-        #self.send_digest(self.messages[0]['from'], self.digest(posts))
 
         # Final report
         reportDict = {'created_at': datetime.datetime.now(), 'report': tmpReport}
@@ -106,11 +101,6 @@ class AutoProcess(object):
 
         return posts
 
-    def digest(self, posts):
-        html = ''
-        for post in posts: html += '<a href="{}">{}</a>\n'.format(post['url'], post['id'])
-        return html
-
     def send_reply(self, message, toAddress):
         sender = Mailer(host='mail.banglamafia.com', port=25, usr='bangla', pwd='Sn"IaaCi')
         email  = Message(From=message['fromAddress'], To=toAddress, Subject=message['subject'], CC=message['ccAddress'])
@@ -123,11 +113,14 @@ class AutoProcess(object):
 
         print 'sending', message['subject'], ' to', toAddress
         
-        sender.send(email)
+        #sender.send(email)
 
-    def send_digest(self, digestAddress, digest):
+    def send_report(self, message, post):
         sender = Mailer(host='mail.banglamafia.com', port=25, usr='bangla', pwd='Sn"IaaCi')
-        email  = Message(From=digestAddress, To=digestAddress, Subject='craigslist-auto-{}'.format(datetime.datetime.now()))
-        email.Html = digest
+        email  = Message(From=message['reportAddress'], To=message['reportAddress'], Subject='craigslist-auto-{}'.format(datetime.datetime.now()))
+
+        html  = 'Sent message to: <a href="{}">{}</a>\n'.format(post['url'], post['url'])
+        html += 'Message Details:\nSubject: {} \nBody:\n{}'.format(message['subject'], message['body'])
+        email.Html = html
 
         sender.send(email)
