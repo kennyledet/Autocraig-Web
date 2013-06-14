@@ -1,11 +1,11 @@
 # Config
 from  flask import Flask, render_template, redirect, request, jsonify, Response, url_for
-app = Flask(__name__)
-
+from bson.objectid  import ObjectId
 import os, datetime, time
 import StringIO
 import models
 import tasks
+app = Flask(__name__)
 
 # Helper functions
 def make_dir(dirname):
@@ -23,6 +23,7 @@ def index():
 @app.route('/messages')
 def messages():
     messages = list(models.connection.acw.messages.find({}))
+    print messages
     return render_template('messages.html', messages=messages, messageCount=len(messages), datetime=datetime.datetime.now())
 
 @app.route('/reports')
@@ -93,7 +94,47 @@ def new_message():
     finally:
         return redirect(url_for('messages'))
 
+@app.route('/_edit_message', methods=['POST'])
+@app.route('/_edit_message/<_id>', methods=['GET'])
+def edit_message(_id=None):
+    if request.method != 'POST':
+        messages = list(models.connection.acw.messages.find({}))
+        message  = models.connection.acw.messages.find_one({u'_id': ObjectId(_id)})
+        return render_template('edit_message.html', messages=messages, message=message, messageCount=len(messages), datetime=datetime.datetime.now())
+    else:
+        fromAddress    = request.form['fromAddress']
+        ccAddress      = request.form['ccAddress']
+        subject        = request.form['subject']
+        body           = request.form['body']
+        reportsEnabled = request.form['reportsEnabled'] == 'on'
+        reportAddress  = request.form['reportAddress']
+        _id = request.form['_id']
 
+        # Parse .txt file of from addresses if uploaded
+        fromAddrList   = request.files.get('fromAddressList')
+        if fromAddrList.stream.getvalue():
+            fromAddrList = fromAddrList.stream.getvalue().split('\n')
+            if '' in fromAddrList: fromAddrList.remove('')
+            fromAddress  = ', '.join(fromAddrList)
+
+        try: # Save message in db
+            db = models.connection.acw.messages
+            db.update({'_id': ObjectId(_id)}, {'$set': {'fromAddress': fromAddress, 'ccAddress': ccAddress,
+                'subject': subject, 'body': body, 'reportsEnabled': reportsEnabled, 'reportAddress': reportAddress }})
+
+            # Save uploads in message attachments folder
+            basePath = os.path.dirname(os.path.realpath(__file__))
+            messageAttachmentsFolder = '{}/uploads/{}/attachments/'.format(basePath, message['_id'])
+            make_dir(messageAttachmentsFolder)
+
+            for attachment in request.files.getlist('attachments'):
+                savePath = '{}{}'.format(messageAttachmentsFolder, attachment.filename)
+                attachment.save(savePath)
+
+        except Exception, e:
+            print e        
+        finally:
+            return redirect(url_for('messages'))
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.

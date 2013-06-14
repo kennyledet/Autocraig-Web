@@ -2,8 +2,8 @@
 {% block main %}
 <div class="pure-u" id="list"><!-- col2 -->
     <div id="email-list" class="content">
-    	<!-- display messages -->
-    	{% for message in messages %}
+        <!-- display messages -->
+        {% for message in messages %}
         <div id="{{ message['_id'] }}" class="email-item pure-g">
             <div class="pure-u-3-4">
                 <h5 class="email-name">Created: {{ message['created_at'].strftime('%a %Y-%m-%d, %H:%M') }}</h5>
@@ -14,7 +14,7 @@
                 <h4 class="email-subject">{{ message['subject'] }}</h4>
                 <p class="">{{ message['body'] }}</p>
 
-                <a href="/_edit_message/{{ message['_id'] }}" class="pure-button edit-button">Edit</a>
+                <button id="{{ message['_id'] }}" class="pure-button edit-button">Edit</button>
             </div>
         </div>
         {% endfor %}
@@ -24,33 +24,34 @@
 <div class="pure-u" id="main">
 <div class="content">
 <div class="email-content pure-r">
-	<div class="email-content-header pure-r"><!-- col3-->
+    <div class="email-content-header pure-r"><!-- col3-->
         <div class="pure-r">
-            <h1 class="email-content-title">New Message</h1>
+            <h1 class="email-content-title">Edit Message</h1>
             <p class="email-content-subtitle">
                 <span>{{ datetime.strftime('%a %Y-%m-%d, %H:%M') }}</span>
             </p>
         </div>
-	</div>
+    </div>
     <div class="email-content-body pure-u-1">
-        <form class="pure-form" method="POST" enctype="multipart/form-data" action="/_new_message">
+        <form class="pure-form" method="POST" enctype="multipart/form-data" action="/_edit_message">
             <fieldset>
                 <p>
                     <label>From</label>
-                    <input name="fromAddress" class="input-xlarge" type="text" placeholder="you@mail.com">
+                    <input name="fromAddress" class="input-xlarge" type="text" value="{{ message['fromAddress'] }}">
                     or
                     <input name="fromAddressList" type="file"/>
                 </p>
                 <p>
                     <label>CC</label>
-                    <input name="ccAddress" class="input-xlarge" type="text" placeholder="cc@mail.com">
+                    <input name="ccAddress" class="input-xlarge" type="text" value="{{ message['ccAddress'] }}">
                 </p>
-                <p><label>Enable reporting <input name="reportsEnabled" type="checkbox"></label>
-                    <input id="reportAddress" name="reportAddress" type="hidden" value="" placeholder="report@mail.com">
+                <p>
+                    <label>Enable reporting <input name="reportsEnabled" type="checkbox"></label>
+                    <input id="reportAddress" name="reportAddress" type="hidden" value="{{ message['reportAddress'] }}">
                 </p>
                 <p>
                     <label>Subject</label>
-                    <input name="subject" class="input-xlarge" type="text" placeholder="Subject">
+                    <input name="subject" class="input-xlarge" type="text" value="{{ message['subject'] }}">
                 </p>
                 <p>
                     <label>Attachments</label>
@@ -60,10 +61,12 @@
                 <div></div>
 
                 <label>Message Content</label>
-                <textarea name="body" class="input-xxlarge expanding" type="text"></textarea>
+                <textarea name="body" class="input-xxlarge expanding" type="text">{{ message['body'] }}</textarea>
                 <div style="margin-top:50px;"></div>
 
-                <button id="addMessage" type="submit" class="pure-button pure-button-primary">Add</button>
+                <input type="hidden" name="_id" value="{{ message['_id'] }}">
+
+                <button id="addMessage" type="submit" class="pure-button pure-button-primary">Submit Changes</button>
             </fieldset>
         </form>
     </div>
