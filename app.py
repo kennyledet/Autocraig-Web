@@ -66,7 +66,7 @@ def new_message():
     ccAddress      = request.form['ccAddress']
     subject        = request.form['subject']
     body           = request.form['body']
-    reportsEnabled = request.form['reportsEnabled'] == 'on'
+    reportsEnabled = True if request.form['reportsEnabled'] == 'on' else False
     reportAddress  = request.form['reportAddress']
 
     # Parse .txt file of from addresses if uploaded
@@ -106,7 +106,8 @@ def edit_message(_id=None):
         ccAddress      = request.form['ccAddress']
         subject        = request.form['subject']
         body           = request.form['body']
-        reportsEnabled = request.form['reportsEnabled'] == 'on'
+        print request.form
+        #reportsEnabled = True if request.form['reportsEnabled'] == True or request.form['reportsEnabled'] == 'on' else False
         reportAddress  = request.form['reportAddress']
         _id = request.form['_id']
 
