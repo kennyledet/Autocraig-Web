@@ -244,3 +244,9 @@ a.secondary-button {
         height: 40px;
     }
 }
+
+.notice {
+    background-color: rgb(97, 184, 66);
+    color: white;
+}
+

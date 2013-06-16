@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="pure-u" id="list"><!-- col2 -->
+    <div class="content">
+    	<!-- display messages -->
+    	{% for message in messages %}
+        <div id="{{ message['_id'] }}" class="email-item pure-g">
+            <div class="pure-u-3-4">
+                <h5 class="email-name">Created: {{ message['created_at'].strftime('%a %Y-%m-%d, %H:%M') }}</h5>
+                <p class="email-from">From: {{ message['fromAddress']}}</p>
+                <p class="email-desc">CC: {{ message['ccAddress'] }}</p>
+                <p class="email-desc">Reports Enabled? <span>{% if message['reportsEnabled'] %}Yes{% else %}No{% endif %}</span></p>
+                <p class="email-desc">Report Address: {{ message['reportAddress'] }}</p>
+                <h4 class="email-subject">{{ message['subject'] }}</h4>
+                <p class="">{{ message['body'] }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="pure-u" id="main">
+<div class="content">
+<div class="email-content pure-r">
+	<div class="email-content-header pure-r"><!-- col3-->
+        <div class="pure-r">
+            <h1 class="email-content-title">New Task</h1>
+            <p class="email-content-subtitle">
+                <span>{{ datetime.strftime('%a %Y-%m-%d, %H:%M') }}</span>
+            </p>
+        </div>
+	</div>
+    <div class="email-content-body pure-u-1">
+    <form class="pure-form">
+	    <fieldset>
+
+		   	<label>Scrape URLS</label>
+		    <textarea id="urls" class="input-xxlarge expanding" type="text" placeholder="http://dallas.craigslist.org/search/?areaID=21&subAreaID=&query=BOOTY&catAbb=sss"></textarea>
+		    <div style="margin-top:50px;"></div>
+
+		    <div style="margin-top:10px;">
+			    <span class="add-on">Rerun every</span>
+			    <input class="span2" id="sleep-time" type="text" placeholder="0"/>
+			    <span class="add-on">seconds,</span>
+			    <input class="span2" id="sleep-amt" type="text" placeholder="0"/>
+			    <span class="add-on">times</span>
+			</div>
+		    <div style="margin-top:15px;"></div>
+
+			<button id="start" type="submit" class="pure-button pure-button-primary">Start</button>
+            <button id="pause" class="pure-button pure-button-disabled">Pause</button>
+            <button id="continue" class="pure-button pure-button-disabled">Continue</button>
+            <button id="stop"  class="pure-button pure-button-disabled">Stop</button>
+            <input type="hidden" id="taskID" name="taskID" value="">
+
+	    </fieldset>
+    </form>
+    </div>
+</div>
+</div>
+</div>
+
+{% endblock %}
+
+<!-- js -->
+{% block js %}
+<script type="text/javascript">
+$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+$('.email-item').click(function(event) {
+	if ( $(this).hasClass('email-item-selected') )
+		 $(this).removeClass('email-item-selected');
+	else
+		 $(this).addClass('email-item-selected');
+});
+
+$('#start').click(function(event) {
+	event.preventDefault();
+	if ( $('#urls').val().split('\n')[0] != null ) {  // post ajax request to start sending messages
+		var selectedMessages = '';
+
+		$('.email-item-selected').each(function() {
+			selectedMessages += $(this).prop('id') + ',';
+		});
+
+		$.getJSON($SCRIPT_ROOT + '/_start', {
+			selectedMessages: selectedMessages,
+			urls:      $('#urls').val(),
+			sleepTime: $('#sleep-time').val(),
+			sleepAmt:  $('#sleep-amt').val()
+		}, function(data) {
+		      if (data.result) {
+                  $('#taskID').val(data.taskID);
+
+                  $('#start').addClass('pure-button-disabled');
+                  $('#pause').prop('class', 'pure-button');
+                  $('#stop').prop('class', 'pure-button');
+              };
+		});
+		
+	};
+	return false;
+});
+
+$('#pause').click(function(event) {
+    event.preventDefault();
+    taskID = $('#taskID').val();
+    if (taskID) {
+        $.getJSON($SCRIPT_ROOT + '/_update_task', {
+            taskID: taskID,
+            state: -1
+        }, function(data) {
+               if (data.result) {
+                $('#pause').addClass('pure-button-disabled');
+                $('#continue').prop('class', 'pure-button');
+                $('#stop').prop('class', 'pure-button');
+               };
+        });
+
+    }
+})
+$('#continue').click(function(event) {
+    event.preventDefault();
+    taskID = $('#taskID').val();
+    if (taskID) {
+        $.getJSON($SCRIPT_ROOT + '/_update_task', {
+            taskID: taskID,
+            state: 1
+        }, function(data) {
+               if (data.result) {
+                $('#continue').addClass('pure-button-disabled');
+                $('#pause').prop('class', 'pure-button');
+                $('#stop').prop('class', 'pure-button');
+               };
+        });
+
+    }
+})
+$('#stop').click(function(event) {
+    event.preventDefault();
+    taskID = $('#taskID').val();
+    if (taskID) {
+        $.getJSON($SCRIPT_ROOT + '/_update_task', {
+            taskID: taskID,
+            state: 0
+        }, function(data) {
+               if (data.result) {
+                $('#stop').addClass('pure-button-disabled');
+                $('#start').prop('class', 'pure-button');
+                $('#pause').prop('class', 'pure-button');
+               };
+        });
+
+    }
+})
+</script>
+{% endblock %}
+</body>
+</html>

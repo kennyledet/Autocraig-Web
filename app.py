@@ -5,6 +5,8 @@ import os, datetime, time
 import StringIO
 import models
 import tasks
+import lib
+from   lib import helpers
 app = Flask(__name__)
 
 # Helper functions
@@ -17,13 +19,31 @@ def make_dir(dirname):
 # Routes
 @app.route('/')
 def index():
+    ''' Index is Login/Registration page '''
+
+    return render_template('index.html', messageCount=1, datetime=datetime.datetime.now())
+
+@app.route('/_login', methods=['GET'])
+def login():
+    email, password = request.args.get('email'), request.args.get('password')
+    user = models.connection.acw.users.find_one({'email': email})
+    if not user:
+        return jsonify(result=0, e='No user with this email')
+    if helpers.hash_pass(password) == user['password']:  # Authentication
+        return jsonify(result=1, e='')
+    else:
+        return jsonify(result=0, e='Password incorrect')
+
+
+
+@app.route('/new_task')
+def new_task():
     messages = list(models.connection.acw.messages.find({}))
-    return render_template('index.html', messages=messages, messageCount=len(messages), datetime=datetime.datetime.now())
+    return render_template('new_task.html', messages=messages, messageCount=len(messages), datetime=datetime.datetime.now())
 
 @app.route('/messages')
 def messages():
     messages = list(models.connection.acw.messages.find({}))
-    print messages
     return render_template('messages.html', messages=messages, messageCount=len(messages), datetime=datetime.datetime.now())
 
 @app.route('/reports')
@@ -136,6 +156,8 @@ def edit_message(_id=None):
             print e        
         finally:
             return redirect(url_for('messages'))
+
+
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.

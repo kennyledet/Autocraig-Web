@@ -1,0 +1,21 @@
+Autocraig-Web
+
+This is a Python Flask app. The Python library requirements are contained in the requirements.txt file.
+You can easily install these requirements with pip by running
+- pip install -r requirements.txt
+
+This web app uses MongoDB as the primary database. Please run a Mongo server, everything else will be handled.
+
+Usage Instructions:
+Control Panel 
+--------------
+New Task - Use this page to start new automation tasks
+Scrape URLS: Paste in your craigslist urls here. the script will get all posts from them
+Here you can also tell the script to run every x seconds, x times. Leave both at 0 to have the script only run once.
+Once a task is started, you may Pause, Continue or Stop it. Once it is stopped it cannot be paused/continued, only started again
+as a new task.
+
+Messages - Use this page to view your custom messages and create new ones
+You can upload a list of From addresses, one per line, or separate a list of From addresses by comma and space..you can also simply choose a single address
+
+Each message in the list view has an Edit button beneath the message content. Click this to edit the message details.
