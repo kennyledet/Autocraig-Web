@@ -1,39 +1,44 @@
 # Config
-from  flask import Flask, render_template, redirect, request, jsonify, Response, url_for
-from bson.objectid  import ObjectId
-import os, datetime, time
 import StringIO
-import models
 import tasks
 import lib
 from   lib import helpers
-app = Flask(__name__)
 
-# Helper functions
-def make_dir(dirname):
-    if not os.path.exists(dirname):
-        return os.makedirs(dirname, mode=0777)
-    else:
-        return None
+import os, datetime, time
+from flask import Flask, render_template, redirect, request, jsonify, Response, url_for, session
+from bson.objectid  import ObjectId
+from flask.ext.login import LoginManager
+import models
+
+app = Flask(__name__)
+app.secret_key = 'WT3SDz0RBvffB0s'
 
 # Routes
 @app.route('/')
 def index():
+    print session
     ''' Index is Login/Registration page '''
-
+    authenticated = session['logged_in'] = True if session.get('logged_in') else False
+    print authenticated
+    if authenticated:
+        print 1
+        return redirect(url_for('new_task'))
     return render_template('index.html', messageCount=1, datetime=datetime.datetime.now())
 
 @app.route('/_login', methods=['GET'])
 def login():
+    ''' Called via AJAX, sets appropriate session variables'''
     email, password = request.args.get('email'), request.args.get('password')
     user = models.connection.acw.users.find_one({'email': email})
     if not user:
+        session['logged_in'] = False
         return jsonify(result=0, e='No user with this email')
     if helpers.hash_pass(password) == user['password']:  # Authentication
+        session['logged_in'] = True
         return jsonify(result=1, e='')
     else:
+        session['logged_in'] = False
         return jsonify(result=0, e='Password incorrect')
-
 
 
 @app.route('/new_task')
@@ -103,7 +108,7 @@ def new_message():
         # Save uploads in message attachments folder
         basePath = os.path.dirname(os.path.realpath(__file__))
         messageAttachmentsFolder = '{}/uploads/{}/attachments/'.format(basePath, message['_id'])
-        make_dir(messageAttachmentsFolder)
+        helpers.make_dir(messageAttachmentsFolder)
 
         for attachment in request.files.getlist('attachments'):
             savePath = '{}{}'.format(messageAttachmentsFolder, attachment.filename)
@@ -146,7 +151,7 @@ def edit_message(_id=None):
             # Save uploads in message attachments folder
             basePath = os.path.dirname(os.path.realpath(__file__))
             messageAttachmentsFolder = '{}/uploads/{}/attachments/'.format(basePath, message['_id'])
-            make_dir(messageAttachmentsFolder)
+            helpers.make_dir(messageAttachmentsFolder)
 
             for attachment in request.files.getlist('attachments'):
                 savePath = '{}{}'.format(messageAttachmentsFolder, attachment.filename)
