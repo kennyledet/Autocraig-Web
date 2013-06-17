@@ -16,12 +16,9 @@ app.secret_key = 'WT3SDz0RBvffB0s'
 # Routes
 @app.route('/')
 def index():
-    print session
     ''' Index is Login/Registration page '''
     authenticated = session['logged_in'] = True if session.get('logged_in') else False
-    print authenticated
     if authenticated:
-        print 1
         return redirect(url_for('new_task'))
     return render_template('index.html', messageCount=1, datetime=datetime.datetime.now())
 
@@ -32,13 +29,17 @@ def login():
     user = models.connection.acw.users.find_one({'email': email})
     if not user:
         session['logged_in'] = False
-        return jsonify(result=0, e='No user with this email')
+        session['user'] = None
+        result, e = (0, "No user with this email")
     if helpers.hash_pass(password) == user['password']:  # Authentication
         session['logged_in'] = True
-        return jsonify(result=1, e='')
+        session['user'] = user['_id']
+        result, e = (1, '')
     else:
         session['logged_in'] = False
-        return jsonify(result=0, e='Password incorrect')
+        session['user'] = None
+        result, e = (0, 'Password incorrect')
+    return jsonify(result=result, e=e)
 
 
 @app.route('/new_task')
