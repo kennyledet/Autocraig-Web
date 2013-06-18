@@ -46,8 +46,16 @@
                     <input name="ccAddress" class="input-xlarge" type="text" value="{{ message['ccAddress'] }}">
                 </p>
                 <p>
-                    <label>Enable reporting <input name="reportsEnabled" type="checkbox"/></label>
-                    <input id="reportAddress" name="reportAddress" type="hidden" value="{{ message['reportAddress'] }}">
+                    {% if message['reportsEnabled'] %}
+                    <label>Enable reporting <input name="reportsEnabled" type="checkbox" 
+                         checked="true"/>
+                    </label>
+                    <input id="reportAddress" name="reportAddress" value="{{ message['reportAddress'] }}">
+                    {% else %}
+                    <label>Enable reporting <input name="reportsEnabled" type="checkbox"/>
+                    </label>
+                    <input id="reportAddress" name="reportAddress" value="{{ message['reportAddress'] }}" type="hidden"/>                    
+                    {% endif %}
                 </p>
                 <p>
                     <label>Subject</label>

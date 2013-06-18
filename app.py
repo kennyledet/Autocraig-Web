@@ -123,7 +123,7 @@ def new_message():
     ccAddress      = request.form['ccAddress']
     subject        = request.form['subject']
     body           = request.form['body']
-    reportsEnabled = True if request.form['reportsEnabled'] == 'on' else False
+    reportsEnabled = True if request.form.get('reportsEnabled') else False
     reportAddress  = request.form['reportAddress']
 
     # Parse .txt file of from addresses if uploaded
@@ -156,7 +156,7 @@ def new_message():
 @app.route('/_edit_message/<_id>', methods=['GET'])
 def edit_message(_id=None):
     if request.method != 'POST':
-        messages = list(models.connection.acw.messages.find({}))
+        messages = list(models.connection.acw.messages.find({'user':session['user']}))
         message  = models.connection.acw.messages.find_one({u'_id': ObjectId(_id)})
         return render_template('edit_message.html', messages=messages, message=message, messageCount=len(messages), datetime=datetime.datetime.now())
     else:
@@ -164,8 +164,7 @@ def edit_message(_id=None):
         ccAddress      = request.form['ccAddress']
         subject        = request.form['subject']
         body           = request.form['body']
-        print request.form
-        #reportsEnabled = True if request.form['reportsEnabled'] == True or request.form['reportsEnabled'] == 'on' else False
+        reportsEnabled = True if request.form.get('reportsEnabled') else False
         reportAddress  = request.form['reportAddress']
         _id = request.form['_id']
 
