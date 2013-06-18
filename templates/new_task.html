@@ -74,6 +74,7 @@ $('.email-item').click(function(event) {
 		 $(this).addClass('email-item-selected');
 });
 
+
 $('#start').click(function(event) {
 	event.preventDefault();
 	if ( $('#urls').val().split('\n')[0] != null ) {  // post ajax request to start sending messages
@@ -119,6 +120,7 @@ $('#pause').click(function(event) {
 
     }
 })
+
 $('#continue').click(function(event) {
     event.preventDefault();
     taskID = $('#taskID').val();
@@ -136,6 +138,7 @@ $('#continue').click(function(event) {
 
     }
 })
+
 $('#stop').click(function(event) {
     event.preventDefault();
     taskID = $('#taskID').val();

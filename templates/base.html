@@ -26,6 +26,15 @@
                 <ul>
                     <li><a href="/reports">Reports</a></li>
                 </ul>
+                {% if session['logged_in'] %}
+                    <ul>
+                        <li><a href="/logout" id="#logout">Logout</a></li>
+                    </ul>
+                {% else %}
+                    <ul>
+                        <li><a href="/">Login/Register</a></li>
+                    </ul>
+                {% endif %}
             </div>
         </div>
     </div><!-- /navigation -->

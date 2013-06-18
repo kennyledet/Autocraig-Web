@@ -1,14 +1,12 @@
 # Config
-import StringIO
-import tasks
+import os, datetime, time, StringIO
+import tasks, models
 import lib
 from   lib import helpers
 
-import os, datetime, time
 from flask import Flask, render_template, redirect, request, jsonify, Response, url_for, session
 from bson.objectid  import ObjectId
 from flask.ext.login import LoginManager
-import models
 
 app = Flask(__name__)
 app.secret_key = 'WT3SDz0RBvffB0s'
@@ -17,46 +15,64 @@ app.secret_key = 'WT3SDz0RBvffB0s'
 @app.route('/')
 def index():
     ''' Index is Login/Registration page '''
-    authenticated = session['logged_in'] = True if session.get('logged_in') else False
-    if authenticated:
+    if session['logged_in']:
         return redirect(url_for('new_task'))
     return render_template('index.html', messageCount=1, datetime=datetime.datetime.now())
 
-@app.route('/_login', methods=['GET'])
+
+@app.route('/login', methods=['POST'])
 def login():
-    ''' Called via AJAX, sets appropriate session variables'''
-    email, password = request.args.get('email'), request.args.get('password')
+    e = None
+    email, password = request.form['email'], request.form['password']
+    print email
+
     user = models.connection.acw.users.find_one({'email': email})
     if not user:
         session['logged_in'] = False
         session['user'] = None
-        result, e = (0, "No user with this email")
-    if helpers.hash_pass(password) == user['password']:  # Authentication
+        e = "No user with this email"
+        return redirect('/')
+    if helpers.hash_pass(password) == user['password']:  # Authenticated
         session['logged_in'] = True
         session['user'] = user['_id']
-        result, e = (1, '')
+        return redirect('/new_task')
     else:
         session['logged_in'] = False
         session['user'] = None
-        result, e = (0, 'Password incorrect')
-    return jsonify(result=result, e=e)
+        e = 'Password incorrect'
+        return redirect('/')
+    
+    return redirect('/new_task')
+
+
+@app.route('/logout', methods=['GET'])
+def logout():
+    session['logged_in'] = False
+    session['user']      = None    
+    return redirect('/')
 
 
 @app.route('/new_task')
 def new_task():
+    if not session['logged_in']:
+        return redirect('/')
+
     messages = list(models.connection.acw.messages.find({}))
     return render_template('new_task.html', messages=messages, messageCount=len(messages), datetime=datetime.datetime.now())
+
 
 @app.route('/messages')
 def messages():
     messages = list(models.connection.acw.messages.find({}))
     return render_template('messages.html', messages=messages, messageCount=len(messages), datetime=datetime.datetime.now())
 
+
 @app.route('/reports')
 def reports():
     messages = list(models.connection.acw.messages.find({}))
     reports  = list(models.connection.acw.reports.find({}))
     return render_template('reports.html', reports=reports, messages=messages, messageCount=len(messages))
+
 
 @app.route('/_update_task')
 def update_task():
@@ -67,6 +83,7 @@ def update_task():
     models.connection.acw.tasks.update({'taskID': taskID}, {'$set': {'state': state}})
 
     return jsonify(result=1)
+
 
 @app.route('/_start')
 def start():
@@ -85,6 +102,7 @@ def start():
         tasks.start_task.delay(selectedMessages, urls, sleepTime, sleepAmt, taskID)
 
     return jsonify(result=result, taskID=taskID)
+
 
 @app.route('/_new_message', methods=['POST', 'GET'])
 def new_message():
@@ -119,6 +137,7 @@ def new_message():
         print e        
     finally:
         return redirect(url_for('messages'))
+
 
 @app.route('/_edit_message', methods=['POST'])
 @app.route('/_edit_message/<_id>', methods=['GET'])

@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block main %}
 <div class="pure-u">
-    <form class="pure-form">
+    <form class="pure-form" method="post" action="/login">
         <fieldset>
             <legend>Login</legend>
 
-            <input type="email" id="email" placeholder="Email" required>
-            <input type="password" id="password" placeholder="Password" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
 
             <button id="login" class="pure-button notice">Sign in</button>
         </fieldset>
@@ -14,7 +14,7 @@
 
     <form action="/register" method="POST" class="pure-form pure-form-stacked pure-form-aligned">
         <fieldset class="pure-group">
-            <legend>Or Register</legend>
+            <legend>Register</legend>
 
             <input type="email" name="email" class="pure-input-1-2" placeholder="Email" required>
             <input type="password" name="password" class="pure-input-1-2" placeholder="Password" required>
@@ -27,16 +27,4 @@
 </div>
 {% endblock %}
 {% block js %}
-<script type="text/javascript">
-$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-    $('#login').click(function(event) {
-        event.preventDefault();
-        $.getJSON($SCRIPT_ROOT + '/_login', {
-            email: $('#email').val(),
-            password: $('#password').val(),
-        }, function(data) {
-            //alert(data.result);
-        });
-    });
-</script>
 {% endblock %}
