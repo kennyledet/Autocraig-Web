@@ -14,6 +14,7 @@ app.secret_key = 'WT3SDz0RBvffB0s'
 # Routes
 @app.route('/')
 def index():
+    print session
     ''' Index is Login/Registration page '''
     if session['logged_in']:
         return redirect(url_for('new_task'))
@@ -57,20 +58,26 @@ def new_task():
     if not session['logged_in']:
         return redirect('/')
 
-    messages = list(models.connection.acw.messages.find({}))
+    messages = list(models.connection.acw.messages.find({'user': session['user']}))
     return render_template('new_task.html', messages=messages, messageCount=len(messages), datetime=datetime.datetime.now())
 
 
 @app.route('/messages')
 def messages():
-    messages = list(models.connection.acw.messages.find({}))
+    if not session['logged_in']:
+        return redirect('/')
+
+    messages = list(models.connection.acw.messages.find({'user': session['user']}))
     return render_template('messages.html', messages=messages, messageCount=len(messages), datetime=datetime.datetime.now())
 
 
 @app.route('/reports')
 def reports():
-    messages = list(models.connection.acw.messages.find({}))
-    reports  = list(models.connection.acw.reports.find({}))
+    if not session['logged_in']:
+        return redirect('/')
+
+    messages = list(models.connection.acw.messages.find({'user': session['user']}))
+    reports  = list(models.connection.acw.reports.find({'user': session['user']}))
     return render_template('reports.html', reports=reports, messages=messages, messageCount=len(messages))
 
 
@@ -99,7 +106,7 @@ def start():
     else:
         result = 1
         taskID = str(time.time())  # record taskID as timestamp
-        tasks.start_task.delay(selectedMessages, urls, sleepTime, sleepAmt, taskID)
+        tasks.start_task.delay(selectedMessages, urls, sleepTime, sleepAmt, taskID, session['user'])
 
     return jsonify(result=result, taskID=taskID)
 
@@ -122,7 +129,7 @@ def new_message():
 
     try: # Save message in db
         models.connection.acw.messages.insert({'created_at': datetime.datetime.now(), 'fromAddress': fromAddress, 'ccAddress': ccAddress,
-            'subject': subject, 'body': body, 'reportsEnabled': reportsEnabled, 'reportAddress': reportAddress })
+            'subject': subject, 'body': body, 'reportsEnabled': reportsEnabled, 'reportAddress': reportAddress, 'user': session['user'] })
 
         # Save uploads in message attachments folder
         basePath = os.path.dirname(os.path.realpath(__file__))

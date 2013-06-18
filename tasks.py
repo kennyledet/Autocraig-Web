@@ -8,7 +8,7 @@ BROKER_URL = 'sqla+sqlite:///celerydb.sqlite'
 celery     = Celery('tasks', broker=BROKER_URL)
 
 @celery.task
-def start_task(selectedMessages, urls, sleepTime, sleepAmt, taskID):
+def start_task(selectedMessages, urls, sleepTime, sleepAmt, taskID, userID):
     # Register task and mark as running
     db   = models.connection.acw.tasks
     task = db.insert({'taskID': taskID, 'state': 1})
@@ -20,7 +20,7 @@ def start_task(selectedMessages, urls, sleepTime, sleepAmt, taskID):
             if iteration <= sleepAmt:
                 messages = [models.connection.acw.messages.find_one({u'_id': ObjectId(message_id)}) 
                             for message_id in selectedMessages]
-                process  = AutoProcess(urls, messages)
+                process  = AutoProcess(urls, messages, userID)
                 process.start()
                 time.sleep(sleepTime)
                 iteration += 1

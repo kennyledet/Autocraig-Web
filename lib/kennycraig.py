@@ -9,12 +9,13 @@ from bs4    import BeautifulSoup
 from itertools import chain
 
 class AutoProcess(object):
-    def __init__(self, urls, messages):
+    def __init__(self, urls, messages, userID):
         self.urls     = urls
         self.messages = messages
         self.reports  = models.connection.acw.reports
         self.tasks    = models.connection.acw.tasks
         self.dupes    = models.connection.acw.dupes
+        self.userID   = userID
 
         self.uploadsBasePath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'uploads'))
 
@@ -58,7 +59,7 @@ class AutoProcess(object):
         ##self.dupes.remove()
 
         # Final report
-        reportDict = {'created_at': datetime.datetime.now(), 'report': tmpReport}
+        reportDict = {'created_at': datetime.datetime.now(), 'report': tmpReport, 'user': self.userID}
         report     = self.reports.insert(reportDict)
 
         print reportDict, report
