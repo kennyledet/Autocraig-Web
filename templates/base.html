@@ -16,23 +16,24 @@
     <div class="pure-u" id="nav"><!-- navigation -->
         <a href="#nav" class="nav-menu-button">Menu</a>
         <div class="nav-inner">
-            <li class="pure-menu-heading">Control Panel</li>
-            <a class="pure-button primary-button" href="/new_task">New Task</a>
+            <li class="pure-menu-heading">Autocraig Web</li>
 
             <div class="pure-menu pure-menu-open">
-                <ul>
-                    <li><a href="/messages">Messages (<span id="email-count" class="email-count">{{ messageCount }}</span>)</a></li>
-                </ul>
-                <ul>
-                    <li><a href="/reports">Reports</a></li>
-                </ul>
                 {% if session['logged_in'] %}
+                    <a class="pure-button primary-button" href="/new_task">New Task</a>
+
+                    <ul>
+                        <li><a href="/messages">Messages (<span id="email-count" class="email-count">{{ messageCount }}</span>)</a></li>
+                    </ul>
+                    <ul>
+                        <li><a href="/reports">Reports</a></li>
+                    </ul>
                     <ul>
                         <li><a href="/logout" id="#logout">Logout</a></li>
                     </ul>
                 {% else %}
                     <ul>
-                        <li><a href="/">Login/Register</a></li>
+                        <li><a href="/">Login / Register</a></li>
                     </ul>
                 {% endif %}
             </div>

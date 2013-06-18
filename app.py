@@ -5,7 +5,7 @@ import lib
 from   lib import helpers
 
 from flask import Flask, render_template, redirect, request, jsonify, Response, url_for, session
-from bson.objectid  import ObjectId
+from bson.objectid   import ObjectId
 from flask.ext.login import LoginManager
 
 app = Flask(__name__)
@@ -18,7 +18,7 @@ def index():
     ''' Index is Login/Registration page '''
     if session['logged_in']:
         return redirect(url_for('new_task'))
-    return render_template('index.html', messageCount=1, datetime=datetime.datetime.now())
+    return render_template('index.html', datetime=datetime.datetime.now())
 
 
 @app.route('/login', methods=['POST'])
@@ -31,7 +31,7 @@ def login():
     if not user:
         session['logged_in'] = False
         session['user'] = None
-        e = "No user with this email"
+        e = 'No user with this email'
         return redirect('/')
     if helpers.hash_pass(password) == user['password']:  # Authenticated
         session['logged_in'] = True
@@ -45,11 +45,17 @@ def login():
     
     return redirect('/new_task')
 
-
 @app.route('/logout', methods=['GET'])
 def logout():
     session['logged_in'] = False
     session['user']      = None    
+    return redirect('/')
+
+
+@app.route('/register', methods=['POST'])
+def register():
+    models.connection.acw.users.insert({'email': request.form['email'], 'password': helpers.hash_pass(request.form['password']), 
+        'role': 'member'})
     return redirect('/')
 
 
