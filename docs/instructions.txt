@@ -1,10 +1,5 @@
 Autocraig-Web
-
-This is a Python Flask app. The Python library requirements are contained in the requirements.txt file.
-You can easily install these requirements with pip by running
-- pip install -r requirements.txt
-
-This web app uses MongoDB as the primary database. Please run a Mongo server, everything else will be handled.
+-------------
 
 Usage Instructions:
 Control Panel 
@@ -19,3 +14,42 @@ Messages - Use this page to view your custom messages and create new ones
 You can upload a list of From addresses, one per line, or separate a list of From addresses by comma and space..you can also simply choose a single address
 
 Each message in the list view has an Edit button beneath the message content. Click this to edit the message details.
+
+
+Server Installation Instructions:
+---------------------------------
+Start by uploading the autocraig-web folder to anywhere on your webserver.
+
+This is a Python Flask app. The Python module requirements are contained in the requirements.txt file.
+You can easily install these requirements with pip by running
+- pip install -r requirements.txt
+To install pip, see: http://www.pip-installer.org/en/latest/installing.html
+
+This web app uses MongoDB as the primary database. Please run a Mongo server, everything else will be handled.
+To install MongoDB, see: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/
+
+The other database technology is handled by sqlite3, and is automatically created.
+
+Now, to run the script you will need to start 2 servers
+The first is the Flask server, this is the actual WSGI server serving Flask (everything but the static files)
+- python app.py -b 0.0.0.0
+It should be running on port 5000 by default
+
+The second is a Celery server. Celery handles the email sending tasks.
+By running the pip command above you already have everything necessary to run it.
+Run the Celery server with
+- celery -A tasks worker --loglevel=info
+
+
+Lastly, you will need to do a reverse proxy to the Flask app as well as serve the files in /static with Apache.
+Edit the settings for your domain in "/etc/httpd/apache/conf/httpd.conf" as follows
+
+<VirtualHost *:80>
+     ServerName domain.com
+
+     ProxyRequests off
+     ProxyPass / http://localhost:5000
+     ProxyPassReverse / http://localhost:5000
+
+     Alias /static/ /path/to/app/static
+</VirtualHost>

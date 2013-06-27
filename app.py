@@ -14,7 +14,7 @@ app.secret_key = 'WT3SDz0RBvffB0s'
 # Routes
 @app.route('/')
 def index():
-    print session
+    #print session
     ''' Index is Login/Registration page '''
     if session['logged_in']:
         return redirect(url_for('new_task'))
@@ -44,6 +44,7 @@ def login():
         return redirect('/')
     
     return redirect('/new_task')
+
 
 @app.route('/logout', methods=['GET'])
 def logout():

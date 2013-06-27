@@ -26,7 +26,10 @@ Sample code:
 
     sender = mailer.Mailer('mail.example.com')
     sender.send(message)
-
+__version__ = "0.7"
+__author__ = "Ryan Ginstrom"
+__license__ = "MIT"
+__description__ = "A module to send email simply in Python"
 """
 import smtplib
 import threading
@@ -60,10 +63,13 @@ import time
 
 from os import path
 
-__version__ = "0.7"
-__author__ = "Ryan Ginstrom"
-__license__ = "MIT"
-__description__ = "A module to send email simply in Python"
+''' Proxy override
+merge this into Mailer class itself and pass in proxy as opt in __init__
+
+import socks
+import socket
+socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS4, proxy_ip, port, True)
+socket.socket = socks.socksocket  # global socket override for proxying'''
 
 class Mailer(object):
     """
