@@ -16,9 +16,11 @@ app.secret_key = 'WT3SDz0RBvffB0s'
 def index():
     #print session
     ''' Index is Login/Registration page '''
-    if session['logged_in']:
+    auth = session.get('logged_in')
+    if auth:
         return redirect(url_for('new_task'))
-    return render_template('index.html', datetime=datetime.datetime.now())
+    else:
+        return render_template('index.html', datetime=datetime.datetime.now())
 
 
 @app.route('/login', methods=['POST'])
@@ -196,8 +198,16 @@ def edit_message(_id=None):
             return redirect(url_for('messages'))
 
 
+@app.route('/settings')
+def settings():
+    if not session['logged_in']:
+        return redirect('/')
+
+    count = len(list(models.connection.acw.messages.find({'user': session['user']})))
+    return render_template('settings.html', messageCount = count)
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.debug = True
+    app.run()
