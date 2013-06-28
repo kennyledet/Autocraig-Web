@@ -38,7 +38,7 @@ It should be running on port 5000 by default
 The second is a Celery server. Celery handles the email sending tasks.
 By running the pip command above you already have everything necessary to run it.
 Run the Celery server with
-- celery -A tasks worker --loglevel=info
+- celery -A lib.tasks worker --loglevel=info
 
 
 Lastly, you will need to do a reverse proxy to the Flask app as well as serve the files in /static with Apache.

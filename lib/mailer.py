@@ -157,12 +157,14 @@ class Mailer(object):
         them as a list:
         mailer.send([msg1, msg2, msg3])
         """
-        ''' Proxy override '''
-
+        '''Proxy override'''
         proxies = list(models.connection.acw.proxies.find({}))[0]['proxies']
         if len(proxies):
             import random
+            from lib.helpers import rbl_check
             proxy, proxy_port = random.choice(proxies).split(':') # get random proxy
+            while not rbl_check(proxy):
+                proxy, proxy_port = random.choice(proxies).split(':')
         else:
             proxy, proxy_port = '', 0
             
