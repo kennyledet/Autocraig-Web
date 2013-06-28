@@ -3,4 +3,3 @@ Celery
 mongokit
 sqlalchemy
 beautifulsoup4
-flask-sqlalchemy

@@ -63,13 +63,18 @@ import time
 
 from os import path
 
-''' Proxy override
-merge this into Mailer class itself and pass in proxy as opt in __init__
-
+''' Proxy override '''
 import socks
 import socket
-socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS4, proxy_ip, port, True)
-socket.socket = socks.socksocket  # global socket override for proxying'''
+import random
+
+proxies = list(models.connection.acw.proxies.find({}))[0]['proxies']
+if len(proxies):
+    proxy = random.choice(proxies).split(':') # get random proxy
+    print 'Using proxy {}'.format(proxy)
+    socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, proxy[0], proxy[1], True)
+    socket.socket = socks.socksocket  # global socket override for proxying
+
 
 class Mailer(object):
     """
