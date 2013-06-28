@@ -1,5 +1,5 @@
 # Config
-import os, datetime, time, StringIO
+import os, datetime, time, StringIO, urllib2
 import tasks, models
 import lib
 from   lib import helpers
@@ -191,20 +191,42 @@ def edit_message(_id=None):
             for attachment in request.files.getlist('attachments'):
                 savePath = '{}{}'.format(messageAttachmentsFolder, attachment.filename)
                 attachment.save(savePath)
-
         except Exception, e:
             print e        
         finally:
             return redirect(url_for('messages'))
 
 
-@app.route('/settings')
+@app.route('/settings', methods=['POST', 'GET'])
 def settings():
     if not session['logged_in']:
         return redirect('/')
+    if request.method == 'POST':
+        url_proxies = request.form.get('url_proxies')
+        try:
+            uploaded_proxies = request.files.get('uploaded_proxies').stream.getvalue()
+        except:
+            uploaded_proxies = None
+        if not url_proxies and not uploaded_proxies:
+            return redirect('/settings')
 
+        proxies = []
+        if url_proxies:
+            proxies.extend(urllib2.urlopen(url_proxies).read().split('\n'))
+        if uploaded_proxies:
+            proxies.extend(uploaded_proxies.split('\n'))
+        if proxies:
+            models.connection.acw.proxies.remove()
+            models.connection.acw.proxies.insert({'proxies': proxies})
+    else:
+        pass
     count = len(list(models.connection.acw.messages.find({'user': session['user']})))
-    return render_template('settings.html', messageCount = count)
+    return render_template('settings.html', messageCount=count)
+
+@app.route('/current_proxies.txt')
+def current_proxies():
+    proxies = list(models.connection.acw.proxies.find({}))[0]['proxies']
+    return render_template('current_proxies.txt', proxies=proxies)
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
