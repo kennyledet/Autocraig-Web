@@ -3,7 +3,23 @@
 <div class="pure-u"><!-- col2 -->
     <div class="content">
         <!-- display settings -->
+        <form class="pure-form" method="POST" enctype="multipart/form-data" action="/settings">
+            <fieldset>
+                <legend>Proxies</legend>
+                    <p>Current Proxy: </p>
+                    <p>
+                        Change Proxy<br><br>
 
+                        <label for="url">Use URL:</label>
+                        <input type="url" name="url_proxies" value="http://spamvilla.com/sock_proxy.txt">
+                    </p>
+                    <p>
+                        <label for="uploaded_proxies">Upload Proxies from .txt:</label>
+                        <input type="file" name="uploaded_proxies"/>
+                    </p>
+                    <input class="pure-button pure-input-1-2" type="submit" value="Save Changes" />
+            </fieldset>
+        </form>
     </div>
 </div>
 
