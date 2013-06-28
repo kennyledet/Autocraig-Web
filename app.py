@@ -25,7 +25,8 @@ def login():
     email, password = request.form['email'], request.form['password']
     print email
 
-    user = models.connection.acw.users.find_one({'email': email})
+    user = models.connection.acw.users.find({'email': email})[0]
+    print user
     if not user:
         session['logged_in'] = False
         session['user'] = None
@@ -33,7 +34,7 @@ def login():
         return redirect('/')
     if helpers.hash_pass(password) == user['password']:  # Authenticated
         session['logged_in'] = True
-        session['user'] = user['_id']
+        session['user'] = str(user['_id'])
         return redirect('/new_task')
     else:
         session['logged_in'] = False
@@ -156,7 +157,7 @@ def new_message():
 def edit_message(_id=None):
     if request.method != 'POST':
         messages = list(models.connection.acw.messages.find({'user':session['user']}))
-        message  = models.connection.acw.messages.find_one({u'_id': ObjectId(_id)})
+        message  = models.connection.acw.messages.find_one({u'_id': str(ObjectId(_id))})
         return render_template('edit_message.html', messages=messages, message=message, messageCount=len(messages), datetime=datetime.datetime.now())
     else:
         fromAddress    = request.form['fromAddress']

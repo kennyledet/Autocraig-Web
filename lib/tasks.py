@@ -18,7 +18,7 @@ def start_task(selectedMessages, urls, sleepTime, sleepAmt, taskID, userID):
         state = db.find_one({'taskID': taskID})['state']
         if state == 1:  # run
             if iteration <= sleepAmt:
-                messages = [models.connection.acw.messages.find_one({u'_id': ObjectId(message_id)}) 
+                messages = [models.connection.acw.messages.find_one({u'_id': str(ObjectId(message_id))}) 
                             for message_id in selectedMessages]
                 process  = AutoProcess(urls, messages, userID)
                 process.start()
