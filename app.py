@@ -1,12 +1,8 @@
 # Config
 import os, datetime, time, StringIO, urllib2
-import tasks, models
-import lib
-from lib import tasks, models helpers
-
 from flask import Flask, render_template, redirect, request, jsonify, Response, url_for, session
-from bson.objectid   import ObjectId
-from flask.ext.login import LoginManager
+from lib import tasks, models, helpers
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
 app.secret_key = 'WT3SDz0RBvffB0s'
