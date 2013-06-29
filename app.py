@@ -199,19 +199,14 @@ def settings():
     if not session['logged_in']:
         return redirect('/')
     if request.method == 'POST':
-        url_proxies = request.form.get('url_proxies')
         try:
             uploaded_proxies = request.files.get('uploaded_proxies').stream.getvalue()
         except:
             uploaded_proxies = None
-        if not url_proxies and not uploaded_proxies:
+        if not uploaded_proxies:
             return redirect('/settings')
 
-        proxies = []
-        if url_proxies:
-            proxies.extend(urllib2.urlopen(url_proxies).read().split('\n'))
-        if uploaded_proxies:
-            proxies.extend(uploaded_proxies.split('\n'))
+        proxies = uploaded_proxies.split('\n')
         if proxies:
             models.connection.acw.proxies.remove()
             models.connection.acw.proxies.insert({'proxies': proxies})

@@ -65,6 +65,7 @@ import time
 from os import path
 
 import models
+import urllib2
 
 def recvline(sock):
     stop = 0
@@ -77,6 +78,15 @@ def recvline(sock):
             break
     return line
  
+def load_proxies():
+    try:
+        proxies = urllib2.urlopen('http://spamvilla.com/sock_proxy.txt').read()
+    except:
+        return None
+    else:
+        return proxies.split('\n')
+
+
 class ProxSMTP( smtplib.SMTP ):
  
     def __init__(self, host='', port=0, p_address='',p_port=0, local_hostname=None,
@@ -158,7 +168,16 @@ class Mailer(object):
         mailer.send([msg1, msg2, msg3])
         """
         '''Proxy override'''
-        proxies = list(models.connection.acw.proxies.find({}))[0]['proxies']
+        proxies = []
+        try:
+            proxies_from_db = list(models.connection.acw.proxies.find({}))[0]['proxies']
+        except:
+            proxies_from_db = []
+
+        proxies_from_url = load_proxies()
+        proxies.extend(proxies_from_db)
+        proxies.extend(proxies_from_url)
+
         if len(proxies):
             import random
             from lib.helpers import rbl_check

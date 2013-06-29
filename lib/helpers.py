@@ -26,5 +26,5 @@ def rbl_check(ip):
         blacklisted, whitelisted = len(blacklist), len(whitelist)
 
         ratio = float(blacklisted) / float(whitelisted + blacklisted)
-        
+        print ratio
         return 1 if ratio < 0.10 else 0
