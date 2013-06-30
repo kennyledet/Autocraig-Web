@@ -7,6 +7,11 @@ from bson.objectid import ObjectId
 app = Flask(__name__)
 app.secret_key = 'WT3SDz0RBvffB0s'
 
+try:
+    proxies = list(models.connection.acw.proxies.find({}))[0]['proxies']
+except:
+    models.connection.acw.proxies.insert({'proxies':[]})
+
 # Routes
 @app.route('/')
 def index():
@@ -218,7 +223,11 @@ def settings():
 
 @app.route('/current_proxies.txt')
 def current_proxies():
-    proxies = list(models.connection.acw.proxies.find({}))[0]['proxies']
+    try:
+        proxies = list(models.connection.acw.proxies.find({}))[0]['proxies']
+    except:
+        models.connection.acw.proxies.insert({'proxies':[]})
+        proxies = None
     return render_template('current_proxies.txt', proxies=proxies)
 
 if __name__ == '__main__':
