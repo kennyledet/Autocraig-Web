@@ -157,7 +157,8 @@ def new_message():
 def edit_message(_id=None):
     if request.method != 'POST':
         messages = list(models.connection.acw.messages.find({'user':session['user']}))
-        message  = models.connection.acw.messages.find_one({u'_id': str(ObjectId(_id))})
+        message  = models.connection.acw.messages.find_one({u'_id': ObjectId(_id)})
+        print message
         return render_template('edit_message.html', messages=messages, message=message, messageCount=len(messages), datetime=datetime.datetime.now())
     else:
         fromAddress    = request.form['fromAddress']
