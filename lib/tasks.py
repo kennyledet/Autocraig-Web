@@ -10,6 +10,9 @@ celery     = Celery('tasks', broker=BROKER_URL)
 @celery.task
 def start_task(selectedMessages, urls, sleepTime, sleepAmt, taskID, userID):
     # Register task and mark as running
+    if not len(selectedMessages):  # Do not run if no messages are selected
+        return
+
     db   = models.connection.acw.tasks
     task = db.insert({'taskID': taskID, 'state': 1})
     iteration = 0
@@ -18,7 +21,7 @@ def start_task(selectedMessages, urls, sleepTime, sleepAmt, taskID, userID):
         state = db.find_one({'taskID': taskID})['state']
         if state == 1:  # run
             if iteration <= sleepAmt:
-                messages = [models.connection.acw.messages.find_one({u'_id': str(ObjectId(message_id))}) 
+                messages = [models.connection.acw.messages.find_one({u'_id': ObjectId(message_id)}) 
                             for message_id in selectedMessages]
                 process  = AutoProcess(urls, messages, userID)
                 process.start()

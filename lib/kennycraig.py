@@ -84,10 +84,6 @@ class AutoProcess(object):
 
             postId  = re.findall(postIdPattern, html)[0]
             print 'Found {}'.format(postId)
-            if not postId or postId in models.get_dupes(): 
-                continue
-
-            models.add_to_dupes(postId)
 
             soup      = BeautifulSoup(html)
             postTitle = soup.find('h2', class_='postingtitle').text
@@ -103,7 +99,7 @@ class AutoProcess(object):
         return posts
 
     def send_reply(self, message, toAddress):
-        sender = Mailer(host='mail.banglamafia.com', port=25, usr='bangla', pwd='Sn"IaaCi')
+        sender = Mailer(host='smtp.gmail.com', port=465, usr='kendrickledet@gmail.com', pwd='rockiscoo1', use_tls=True)
         email  = Message(From=message['fromAddress'], To=toAddress, Subject=message['subject'], CC=message['ccAddress'])
         email.Html = message.body
 
@@ -114,10 +110,10 @@ class AutoProcess(object):
 
         print 'sending', message['subject'], ' to', toAddress
         
-        #sender.send(email)
+        sender.send(email)
 
     def send_report(self, message, post):
-        sender = Mailer(host='mail.banglamafia.com', port=25, usr='bangla', pwd='Sn"IaaCi')
+        sender = Mailer(host='smtp.gmail.com', port=465, usr='kendrickledet@gmail.com', pwd='rockiscoo1', use_tls=True)
         email  = Message(From=message['reportAddress'], To=message['reportAddress'], Subject='craigslist-auto-{}'.format(datetime.datetime.now()))
 
         html  = 'Sent message to: <a href="{}">{}</a>\n'.format(post['url'], post['url'])

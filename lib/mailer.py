@@ -79,8 +79,10 @@ def recvline(sock):
     return line
  
 def load_proxies():
+    url = 'http://spamvilla.com/sock_proxy.txt'
     try:
-        proxies = urllib2.urlopen('http://spamvilla.com/sock_proxy.txt').read()
+        req = urllib2.Request(url, None, headers)
+        proxies = urllib2.urlopen(req).read()
     except:
         return None
     else:
@@ -177,6 +179,7 @@ class Mailer(object):
         proxies_from_url = load_proxies()
         proxies.extend(proxies_from_db)
         proxies.extend(proxies_from_url)
+        print 'Proxies: {}'.format(proxies)
 
         if len(proxies):
             import random
