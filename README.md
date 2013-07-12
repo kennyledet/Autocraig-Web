@@ -4,6 +4,8 @@ Automated Craigslist Reply Tool
 
 This tool allows for the scraping and replying to of Craigslist postings based on listings URLs (such as searches).
 
+It started out as an extension of [autocraig](https://github.com/alexksikes/autocraig to provide a web interface), but I quickly realized that this core script had many flaws and didn't even work fully, so I rewrote it as kennycraig.
+
 Installation Instructions
 --------------------------
 This is a Python web app built with the amazing Flask framework. You'll need Python and Flask installed.
