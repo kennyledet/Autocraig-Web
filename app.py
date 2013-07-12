@@ -28,10 +28,10 @@ def index():
 def login():
     e = None
     email, password = request.form['email'], request.form['password']
-    print email
+    #print email
 
     user = models.connection.acw.users.find({'email': email})[0]
-    print user
+    #print user
     if not user:
         session['logged_in'] = False
         session['user'] = None
@@ -139,12 +139,14 @@ def new_message():
         fromAddress  = ', '.join(fromAddrList)
 
     try: # Save message in db
-        models.connection.acw.messages.insert({'created_at': datetime.datetime.now(), 'fromAddress': fromAddress, 'ccAddress': ccAddress,
-            'subject': subject, 'body': body, 'reportsEnabled': reportsEnabled, 'reportAddress': reportAddress, 'user': session['user'] })
+        message_id = models.connection.acw.messages.insert({'created_at': datetime.datetime.now(), 
+                    'fromAddress': fromAddress, 'ccAddress': ccAddress,
+                    'subject': subject, 'body': body, 'reportsEnabled': reportsEnabled, 
+                    'reportAddress': reportAddress, 'user': session['user'] })
 
         # Save uploads in message attachments folder
         basePath = os.path.dirname(os.path.realpath(__file__))
-        messageAttachmentsFolder = '{}/uploads/{}/attachments/'.format(basePath, message['_id'])
+        messageAttachmentsFolder = '{}/uploads/{}/attachments/'.format(basePath, str(message_id))
         helpers.make_dir(messageAttachmentsFolder)
 
         for attachment in request.files.getlist('attachments'):
@@ -163,7 +165,6 @@ def edit_message(_id=None):
     if request.method != 'POST':
         messages = list(models.connection.acw.messages.find({'user':session['user']}))
         message  = models.connection.acw.messages.find_one({u'_id': ObjectId(_id)})
-        print message
         return render_template('edit_message.html', messages=messages, message=message, messageCount=len(messages), datetime=datetime.datetime.now())
     else:
         fromAddress    = request.form['fromAddress']

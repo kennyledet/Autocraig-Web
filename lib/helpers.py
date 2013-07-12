@@ -1,5 +1,6 @@
 import hashlib
 import time
+import os
 from splinter import Browser
 
 def hash_pass(password):
@@ -13,7 +14,7 @@ def make_dir(dirname):
 
 def rbl_check(ip):
     """ Check an IP against multiple RBLs """
-    with Browser(driver_name='chrome') as b:
+    with Browser() as b:
         b.visit('https://rblwatcher.com/')
         b.fill('ip', ip)
         b.find_by_id('btn_checkip').click()

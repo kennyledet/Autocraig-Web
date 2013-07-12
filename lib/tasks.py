@@ -2,10 +2,12 @@ import os, time
 import models
 from celery import Celery
 from kennycraig import AutoProcess
-from bson.objectid  import ObjectId
+from bson.objectid import ObjectId
+
 
 BROKER_URL = 'sqla+sqlite:///celerydb.sqlite'
-celery     = Celery('tasks', broker=BROKER_URL)
+celery = Celery('tasks', broker=BROKER_URL)
+
 
 @celery.task
 def start_task(selectedMessages, urls, sleepTime, sleepAmt, taskID, userID):
@@ -13,7 +15,7 @@ def start_task(selectedMessages, urls, sleepTime, sleepAmt, taskID, userID):
     if not len(selectedMessages):  # Do not run if no messages are selected
         return
 
-    db   = models.connection.acw.tasks
+    db = models.connection.acw.tasks
     task = db.insert({'taskID': taskID, 'state': 1})
     iteration = 0
     while True:
@@ -21,10 +23,10 @@ def start_task(selectedMessages, urls, sleepTime, sleepAmt, taskID, userID):
         state = db.find_one({'taskID': taskID})['state']
         if state == 1:  # run
             if iteration <= sleepAmt:
-                messages = [models.connection.acw.messages.find_one({u'_id': ObjectId(message_id)}) 
+                messages = [models.connection.acw.messages.find_one({u'_id': ObjectId(message_id)})
                             for message_id in selectedMessages]
                 process  = AutoProcess(urls, messages, userID)
-                process.start()
+                process.start(taskID)
                 time.sleep(sleepTime)
                 iteration += 1
             else:

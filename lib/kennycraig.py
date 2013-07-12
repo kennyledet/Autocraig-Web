@@ -4,6 +4,7 @@
 
 import re, urllib2, datetime, random, os
 import models
+import settings
 from mailer import Mailer, Message
 from bs4    import BeautifulSoup
 from itertools import chain
@@ -19,15 +20,13 @@ class AutoProcess(object):
 
         self.uploadsBasePath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'uploads'))
 
-    def start(self):
+    def start(self, taskID):
         # Scrape posts
         posts     = list(chain.from_iterable([self.scrape_posts(url) for url in self.urls]))
         tmpReport = {}
 
-        print 'Using messages: {}'.format(self.messages)
-        print 'Found posts: {}'.format(posts)
-
         for post in posts:
+            #print post
             # Check current task state
             state = self.tasks.find_one({'taskID': taskID})['state']
             if state == 0:  # quit
@@ -50,13 +49,13 @@ class AutoProcess(object):
             self.send_reply(message, post['toAddress'])
 
             if message['reportsEnabled']:
-                self.send_report(message)
+                self.send_report(message, post)
 
             # Add to task report
             tmpReport.update({post['url'].replace('.','*') : {'id': message['_id'], 'subject': message['subject'],
                 'body': message['body']}})
 
-        ##self.dupes.remove()
+        self.dupes.remove()
 
         # Final report
         reportDict = {'created_at': datetime.datetime.now(), 'report': tmpReport, 'user': self.userID}
@@ -78,9 +77,12 @@ class AutoProcess(object):
         postLinks  = [row.contents[1]['href'] for row in postRows]
 
         for post in postLinks:
-            print 'Scraping {}'.format(post)
+            #print 'Scraping {}'.format(post)
             postUrl = 'http://{}{}'.format(baseUrl, post)
-            html    = urllib2.urlopen(postUrl).read()
+            try:
+                html = urllib2.urlopen(postUrl).read()
+            except:
+                continue
 
             postId  = re.findall(postIdPattern, html)[0]
             print 'Found {}'.format(postId)
@@ -90,34 +92,43 @@ class AutoProcess(object):
             postBody  = soup.find('section', id='postingbody').text
 
             emails    = re.findall(mailPattern, html)
-            toAddress = emails[0]
-            for email in emails:
-                if 'craigslist' not in email: toAddress = email  # non-standard cl reply address, use this
+            #print html
 
-            posts.append({'url': postUrl, 'id': postId, 'title': postTitle, 'body': postBody, 'toAddress': toAddress})
+            if not emails:
+                continue
+            else:
+                toAddress = emails[0]
+                for email in emails:
+                    if 'craigslist' not in email: toAddress = email  # non-standard cl reply address, use this
+
+                posts.append({'url': postUrl, 'id': postId, 'title': postTitle, 'body': postBody, 'toAddress': toAddress})
 
         return posts
 
     def send_reply(self, message, toAddress):
-        sender = Mailer(host='smtp.gmail.com', port=465, usr='kendrickledet@gmail.com', pwd='rockiscoo1', use_tls=True)
+        sender = Mailer(host=settings.host, port=settings.port, usr=settings.username, 
+                    pwd=settings.password, use_tls=settings.tls)
         email  = Message(From=message['fromAddress'], To=toAddress, Subject=message['subject'], CC=message['ccAddress'])
-        email.Html = message.body
+        email.Html = message['body']
 
         messageUploads = '{}/{}/attachments/'.format(self.uploadsBasePath, message['_id'])
 
         for upload in os.listdir(messageUploads):
             email.attach('{}{}'.format(messageUploads, upload))
 
-        print 'sending', message['subject'], ' to', toAddress
+        print 'Sending {} to {}'.format(message['subject'], toAddress)
         
         sender.send(email)
 
     def send_report(self, message, post):
-        sender = Mailer(host='smtp.gmail.com', port=465, usr='kendrickledet@gmail.com', pwd='rockiscoo1', use_tls=True)
+        sender = Mailer(host=settings.host, port=settings.port, usr=settings.username, 
+                    pwd=settings.password, use_tls=settings.tls)
         email  = Message(From=message['reportAddress'], To=message['reportAddress'], Subject='craigslist-auto-{}'.format(datetime.datetime.now()))
 
         html  = 'Sent message to: <a href="{}">{}</a>\n'.format(post['url'], post['url'])
         html += 'Message Details:\nSubject: {} \nBody:\n{}'.format(message['subject'], message['body'])
         email.Html = html
+
+        print 'Sending report for {}'.format(post['id'])
 
         sender.send(email)
